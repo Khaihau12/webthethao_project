@@ -1,0 +1,595 @@
+/* Reset cơ bản và font */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+}
+
+/* Prevent accidental horizontal overflow globally (safe default) */
+html, body { max-width: 100%; overflow-x: hidden; }
+/* prevent long words or unbroken content from expanding the viewport */
+body, p, li, h1, h2, h3, h4, h5 { overflow-wrap: anywhere; word-break: break-word; }
+
+.container {
+    width: 94%;
+    max-width: 1200px; 
+    margin: 0 auto;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s;
+}
+
+/* Biến màu sắc */
+.color-main { color: #333; }
+.color-24h { color: #d90000; } /* Màu đỏ chủ đạo */
+.color-green-custom { color: #78B43D; } /* Màu xanh lá cho tiêu đề chuyên mục */
+.hover-color-24h:hover { color: #d90000; }
+
+/* Các Utility class */
+.d-flex { display: flex; }
+.justify-content-between { justify-content: space-between; }
+.align-items-center { align-items: center; }
+.fw-bold { font-weight: bold; }
+.fw-medium { font-weight: 500; }
+.text-uppercase { text-transform: uppercase; }
+.padd-t-10 { padding-top: 10px; }
+.mar-b-5 { margin-bottom: 5px; }
+.mar-b-15 { margin-bottom: 15px; }
+.mar-t-40 { margin-top: 40px; }
+.flex-auto { flex: 1; }
+.pos-rel { position: relative; }
+.img-fluid { max-width: 100%; height: auto; }
+.d-block { display: block; }
+.width-100 { width: 100%; }
+
+/* --- GRID MÔ PHỎNG (Sử dụng Flexbox) --- */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 0;
+    margin-right: 0;
+    gap: 2%;
+}
+
+/* ensure flex children cannot force the container to overflow */
+.row > * { min-width: 0; }
+
+.col-8, .col-6, .col-4 {
+    padding-left: 1%;
+    padding-right: 1%;
+}
+.col-8 { flex: 0 0 66.6667%; max-width: 66.6667%; }
+.col-6 { flex: 0 0 49%; max-width: 49%; }
+.col-4 { flex: 0 0 32%; max-width: 32%; }
+
+/* Responsive: stack columns on narrower screens */
+@media (max-width: 900px) {
+    .col-8, .col-6, .col-4 { flex: 0 0 100%; max-width: 100%; }
+    .hightl-24h-block { flex-direction: column; }
+    .hightl-24h-big { border-right: none; padding-right: 0; }
+    /* ensure featured block content doesn't touch the left edge */
+    .hightl-24h-big, .hightl-24h-list { padding-left: 6px; padding-right: 6px; }
+    /* make sure container does not grow beyond viewport */
+    .container { max-width: 100%; box-sizing: border-box; }
+    .main-column, .sidebar-column { min-width: 0; }
+}
+
+@media (max-width: 480px) {
+    .logo a { font-size: 1rem; }
+    .main-nav li a { padding: 8px 10px; font-size: 13px; }
+    .hightl-img-big { aspect-ratio: 4/3; }
+    /* Make top-bar compact and let elements stack vertically */
+    .top-bar .container { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .top-menu ul { width: 100%; }
+    .top-menu form { margin-left: 0; width: 100%; }
+    .top-menu form input { width: calc(100% - 36px); }
+    /* reduce side padding for main content on very small screens */
+    .container { padding-left: 6px; padding-right: 6px; }
+}
+
+
+/* --------------------------------------
+   HEADER & NAVIGATION CHUNG
+   -------------------------------------- */
+
+/* --- TOP BAR --- */
+.top-bar {
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    font-size: 14px;
+}
+
+.top-bar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 18px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.logo a:hover {
+    color: inherit;
+}
+
+.logo-subtext {
+    font-size: 12px;
+    font-weight: normal;
+    color: #888;
+}
+
+/* TOP MENU - ĐÃ CĂN CHỈNH NGANG HÀNG */
+.top-menu ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+.top-menu li {
+    margin-left: 15px;
+}
+
+.top-menu li a {
+    color: #333; 
+    padding: 5px 0;
+    white-space: nowrap;
+}
+
+.top-menu li a:hover {
+    color: #d90000;
+}
+
+.top-menu li.active a {
+    color: red; 
+    font-weight: bold;
+}
+
+.top-menu form {
+    margin-left: 20px; 
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 3px 5px;
+    background-color: #f8f8f8;
+}
+
+/* --- MAIN NAVIGATION --- */
+.main-nav {
+    background-color: #333;
+    color: #fff;
+    border-top: 3px solid #d90000; 
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    overflow-x: auto; /* allow horizontal scroll on small screens */
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+}
+
+.main-nav li a {
+    display: block;
+    padding: 10px 15px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+/* Prevent main content from shifting under fixed header on small screens */
+@media (max-width: 600px) {
+    .content-area { margin-top: 6px; }
+    .main-column { padding-right: 0 !important; }
+}
+
+/* Tweak featured title block so it doesn't overflow left on large screens */
+.hightl-24h-big { padding-left: 8px; }
+
+/* main column padding helper (used instead of inline styles) */
+.main-column-pad { padding-right: 20px; }
+@media (max-width: 900px) {
+    .main-column-pad { padding-right: 0; }
+}
+
+/* Article header adjustments for small screens */
+@media (max-width: 600px) {
+    .article-title { font-size: 20px; line-height: 1.25; }
+    .article-meta-info { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .breadcrumb { font-size: 13px; }
+    .article-content { padding-left: 6px; padding-right: 6px; }
+}
+
+.main-nav li a:hover,
+.main-nav li a.active {
+    background-color: #d90000; 
+}
+
+/* --- SUB NAVIGATION (Chỉ xuất hiện trên article.php) --- */
+.sub-nav-menu-container {
+    padding: 0;
+    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+}
+
+.sub-nav-menu {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+}
+
+.sub-nav-menu li a {
+    display: block;
+    padding: 8px 15px;
+    color: #666;
+    border-right: 1px solid #eee;
+}
+
+.sub-nav-menu li a:hover {
+    color: #d90000;
+    background-color: #f9f9f9;
+}
+
+
+/* --------------------------------------
+   STYLES CHO TRANG CHỦ (index.php) 
+   -------------------------------------- */
+.main-content-24h {
+    background-color: #fff;
+    margin-top: 15px;
+}
+
+/* --- 1 & 2. KHỐI TIN NỔI BẬT (hightl-24h-block) --- */
+.hightl-24h-block {
+    padding: 20px 0;
+}
+
+.hightl-24h-big {
+    border-right: 1px solid #eee;
+    padding-right: 20px;
+}
+
+/* control featured column sizing via CSS class */
+.hightl-24h-big--col { 
+    flex: 0 0 50%; 
+    max-width: 50%;
+}
+
+@media (max-width: 900px) {
+    /* on narrow screens, make featured area full width so it doesn't show only half */
+    .hightl-24h-big--col { flex: 0 0 100%; max-width: 100%; border-right: none; padding-right: 0; }
+    .hightl-24h-list { padding-left: 0; }
+}
+
+.hightl-img-big {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    margin-bottom: 15px;
+    aspect-ratio: 16/9;
+}
+
+.hightl-title-big {
+    font-size: 28px;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 480px) {
+    .hightl-title-big { font-size: 22px; }
+    .hightl-img-big { aspect-ratio: 4/3; margin-left: auto; margin-right: auto; display: block; }
+    .hightl-24h-big { text-align: left; }
+}
+
+
+/* sub-nav toggle hidden by default on desktop */
+.sub-nav-toggle { display: none; }
+
+/* Make sub-nav visible and nicely positioned on all devices; on narrow screens it becomes horizontally scrollable but always visible */
+.sub-nav-menu { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 8px 0; }
+.sub-nav-menu li a { white-space: nowrap; padding: 8px 12px; }
+
+@media (max-width: 900px) {
+    /* Keep sub-nav horizontally scrollable but visible by default */
+    .sub-nav-menu { width: 100%; box-sizing: border-box; padding-left: 6px; padding-right: 6px; }
+
+    /* Hide sidebar market/news blocks on small screens to reduce noise */
+    .market-news-block, .latest-news-block, .ttdn-24h-b__slide { display: none !important; }
+}
+
+/* Prevent accidental horizontal page scrolling on small devices (fix article page dragging) */
+@media (max-width: 900px) {
+    html, body {
+        overflow-x: hidden; /* disallow page-level horizontal scroll, inner scrolls (nav) still work */
+        -webkit-overflow-scrolling: touch;
+    }
+    /* ensure sub-nav fits inside the container and won't force page overflow */
+    .sub-nav-menu {
+        width: 100%;
+        box-sizing: border-box;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    /* ensure row elements don't create overflow */
+    .row { overflow-x: hidden; }
+}
+.hightl-summary {
+    font-size: 16px;
+    color: #666;
+}
+
+.hightl-24h-list {
+    padding-left: 20px;
+}
+
+.hightl-24h-items-cate a {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.hightl-24h-items h3 a {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.video-news-block {
+    font-size: 14px;
+}
+
+.video-item i {
+    margin-right: 5px;
+}
+
+/* Tin tức trong ngày block (feature + three thumbnails) */
+.tin-tuc-trong-ngay { background: #fff; padding: 18px; border-radius: 2px; }
+.tin-tuc-trong-ngay .tin-tuc-tit { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.tin-tuc-trong-ngay .tin-tuc-tit h2 { color: #78B43D; margin:0; border-bottom:3px solid #78B43D; padding-bottom:6px; }
+.tin-tuc-trong-ngay .tin-tuc-nav a { margin-left:12px; color:#666; font-size:13px; }
+.tin-tuc-grid { display:flex; gap:16px; align-items:flex-start; }
+.tin-feature { display:flex; gap:12px; align-items:center; width:100%; }
+.tin-feature img { width: 60%; height:auto; object-fit:cover; border-radius:4px; display:block; max-width: 640px; max-height: 420px; }
+.tin-feature-body { flex:1; min-width:0; padding-left: 10px; padding-top: 0; display:flex; flex-direction:column; justify-content:center; }
+.tin-feature-body h3 { font-size:24px; margin:0 0 8px 0; }
+.tin-feature-body .muted { color:#777; font-size:14px; }
+.tin-small-list { display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin-top:8px; }
+.tin-small-item { text-align:left; }
+.tin-small-item img { width:100%; height:90px; object-fit:cover; display:block; margin-bottom:8px; border-radius:2px; max-width: 100%; }
+.tin-small-item h4 { font-size:15px; margin:0; line-height:1.3; }
+
+/* Defensive fixes: ensure headings render horizontally and have room */
+.tin-feature { align-items: flex-start; }
+.tin-feature img { min-width: 180px; flex: 0 0 45%; }
+.tin-feature-body h3, .tin-small-item h4 {
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
+    display: block !important;
+}
+
+/* Desktop: use grid for the three small thumbnails to avoid flex-shrink problems */
+@media (min-width: 901px) {
+    .tin-feature img { width: 55%; max-width: 520px; max-height: 360px; }
+    .tin-small-list { grid-template-columns: repeat(3, minmax(160px, 1fr)); gap: 18px; }
+    .tin-small-item img { height: 100px; max-height: 100px; }
+    /* Desktop: show image on the left and text on the right */
+    /* Desktop: show image on the right and text on the left, image flush to block right edge */
+    .tin-feature { flex-direction: row-reverse; }
+    /* text column: allow shrinking, keep small left padding for breathing room */
+    .tin-feature-body { flex: 1 1 52%; padding-left: 12px; padding-right: 0; text-align: left; min-width: 0; }
+    /* media column (image): fixedish width, sit flush to the outer container */
+    .tin-feature-media { flex: 0 0 48%; padding-right: 0; display: flex; align-items: flex-start; }
+    .tin-tuc-trong-ngay { padding-right: 0; }
+    /* make the image fill its column and touch the right edge */
+    .tin-feature-media img,
+    .tin-feature img { display: block; width: 100%; height: auto; margin: 0; object-fit: cover; border-radius: 6px; }
+}
+
+/* make sure feature body won't collapse and cause neighboring columns to squeeze */
+.tin-feature-body { min-width: 0; }
+
+@media (max-width: 900px) {
+    .tin-tuc-grid { flex-direction:column; }
+    .tin-feature { flex-direction:column; }
+    .tin-feature img { width:100%; aspect-ratio: 16/9; }
+    .tin-small-list { grid-template-columns: repeat(3, 1fr); gap:8px; }
+    .tin-small-item img { height:70px; }
+}
+
+
+/* --- 3. KHỐI TIN CHUYÊN MỤC DÀI (Kinh Doanh) --- */
+.cate-news-24h-r {
+    padding-bottom: 20px;
+}
+
+.cate-news-24h-r__tit h2 a {
+    font-size: 18px;
+    padding-bottom: 3px;
+    border-bottom: 2px solid #78B43D;
+}
+
+.list-news-item {
+    align-items: flex-start;
+}
+
+.list-news-img {
+    flex: 0 0 30%;
+    max-width: 30%;
+    margin-right: 3%;
+    overflow: hidden;
+}
+
+.list-news-img img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 16/9;
+}
+
+.list-news-title a {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+
+/* --- 4. KHỐI TIN NÓNG (TIN TỨC TRONG NGÀY - Sidebar) --- */
+.latest-news-block {
+    background-color: #f9f9f9;
+    padding: 15px;
+}
+
+.latest-news-tit {
+    font-size: 18px;
+}
+
+.sidebar-article {
+    padding-bottom: 8px;
+    border-bottom: 1px dotted #ccc;
+    margin-bottom: 8px;
+}
+
+.sidebar-article:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.sidebar-article h4 {
+    font-size: 11px;
+    color: #888;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+.sidebar-article p a {
+    font-size: 14px;
+    font-weight: bold;
+    display: block;
+}
+
+
+/* --- 5. KHỐI TIN TỨC THỊ TRƯỜNG (Sidebar) --- */
+.market-news-block {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.tttt-24h-r-sma {
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.tttt-24h-r-sma:last-child {
+    margin-bottom: 0;
+}
+
+.tttt-24h-r-sma__img {
+    flex: 0 0 32%;
+    max-width: 32%;
+}
+
+.tttt-24h-r-sma__img img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 16/9;
+}
+
+.tttt-24h-r-sma__tit h3 a {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+
+/* --------------------------------------
+   STYLES CHO TRANG CHI TIẾT (article.php) 
+   -------------------------------------- */
+
+.breadcrumb {
+    font-size: 13px;
+    padding: 15px 0 10px;
+    color: #666;
+}
+
+.breadcrumb a {
+    color: #007bff;
+}
+
+.breadcrumb .active {
+    font-weight: bold;
+    color: #78B43D;
+}
+
+.full-article {
+    background-color: #fff;
+}
+
+.article-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    line-height: 1.25;
+    margin-bottom: 15px;
+}
+
+.article-meta-info {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.article-meta-info .date-time {
+    color: #c00;
+    font-weight: bold;
+}
+
+.action-buttons button {
+    background-color: #f1f1f1;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.article-content {
+    font-size: 17px;
+    line-height: 1.7;
+    color: #222;
+}
+
+.article-content p {
+    margin-bottom: 25px;
+    text-align: justify;
+}
