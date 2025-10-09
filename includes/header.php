@@ -1,5 +1,26 @@
 <?php
-// Tên file: /includes/header.php
+// Tên file: /includes/header.php (PHIÊN BẢN TINH GỌN)
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../classes/CategoryRepository.php';
+
+// Chỉ khởi tạo kết nối CSDL một lần
+if (!isset($conn) || !$conn->ping()) {
+    $db = Database::getInstance();
+    $conn = $db->getConnection();
+}
+
+// Lấy categories cho menu chính
+$categoryRepo = new CategoryRepository($conn);
+$all_categories = $categoryRepo->getAllCategories();
+
+// Xây dựng cây menu chuyên mục
+$category_map = [];
+foreach ($all_categories as $cat) {
+    $pid = $cat['parent_id'] ?: 0;
+    if (!isset($category_map[$pid])) $category_map[$pid] = [];
+    $category_map[$pid][] = $cat;
+}
 ?>
 <header class="top-bar">
     <div class="container">
@@ -10,10 +31,6 @@
         </div>
         <nav class="top-menu">
             <ul>
-                <li><a href="#">Báo số 11 Malmo</a></li>
-                <li class="active"><a href="#">Giá vàng</a></li>
-                <li><a href="#">Đoàn tùy tùng</a></li>
-                <li><a href="#">Lịch</a></li>
                 <li>
                     <form action="index.php" method="get">
                         <input type="text" name="q" placeholder="Nhập tin cần tìm">
@@ -28,16 +45,28 @@
 <nav class="main-nav">
     <div class="container">
         <ul>
-            <li><a href="index.php" class="active"><i class="fa fa-home"></i> TIN TỨC</a></li>
-            <li><a href="#">BÓNG ĐÁ</a></li>
-            <li><a href="#">KINH DOANH</a></li>
-            <li><a href="#">GIẢI TRÍ</a></li>
-            <li><a href="#">24H TINH BÓNG ĐÁ - THỂ THAO</a></li>
-            <li><a href="#">SỨC KHỎE</a></li>
-            <li><a href="#">HI-TECH</a></li>
-            <li><a href="#">THẾ GIỚI</a></li>
-            <li><a href="#">THỂ THAO</a></li>
-            <li><a href="#">Ô TÔ</a></li>
+            <li><a href="index.php" class="active"><i class="fa fa-home"></i> TRANG CHỦ</a></li>
+            <?php
+            // Hiển thị menu cấp 1
+            foreach ($category_map[0] ?? [] as $top_cat) {
+                $children = $category_map[$top_cat['id']] ?? [];
+                
+                if (empty($children)) {
+                    // Menu không có menu con
+                    echo '<li><a href="category.php?slug=' . htmlspecialchars($top_cat['slug']) . '">' . htmlspecialchars(strtoupper($top_cat['name'])) . '</a></li>';
+                } else {
+                    // Menu có menu con
+                    echo '<li class="has-children">';
+                    echo '<a href="category.php?slug=' . htmlspecialchars($top_cat['slug']) . '">' . htmlspecialchars(strtoupper($top_cat['name'])) . '</a>';
+                    echo '<ul class="sub-menu">';
+                    foreach ($children as $child_cat) {
+                        echo '<li><a href="category.php?slug=' . htmlspecialchars($child_cat['slug']) . '">' . htmlspecialchars($child_cat['name']) . '</a></li>';
+                    }
+                    echo '</ul>';
+                    echo '</li>';
+                }
+            }
+            ?>
         </ul>
     </div>
 </nav>
