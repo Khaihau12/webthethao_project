@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 /* Reset cơ bản và font */
 * {
     box-sizing: border-box;
@@ -6,7 +7,7 @@
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Roboto', sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f4f4f4;
@@ -200,6 +201,39 @@ a {
     font-size: 13px;
     transition: background-color 0.3s;
     white-space: nowrap;
+}
+
+/* Dropdown submenu styling to prevent items from wrapping or dropping */
+.main-nav ul { gap: 12px; align-items: center; }
+.main-nav li { position: relative; }
+.main-nav .has-children > a::after { content: none; }
+.main-nav .sub-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 160px;
+    background: #333;
+    padding: 8px 0;
+    border-radius: 2px;
+    display: none;
+    z-index: 2000;
+}
+.main-nav .sub-menu li { display: block; margin: 0; }
+.main-nav .sub-menu li a { display: block; padding: 8px 12px; color: #fff; }
+.main-nav .sub-menu li a:hover { background: #444; }
+.main-nav .has-children:hover .sub-menu,
+.main-nav .has-children:focus-within .sub-menu { display: block; }
+
+/* Prevent nav items from wrapping on narrow viewports; allow horizontal scrolling instead */
+.main-nav ul { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.main-nav ul::-webkit-scrollbar { height: 6px; }
+
+/* On small screens we want submenus to be static and visible under their parent (touch friendly) */
+@media (max-width: 900px) {
+    .main-nav .sub-menu { position: static; display: none; background: transparent; padding: 0; }
+    .main-nav .has-children .sub-menu { display: none; }
+    .main-nav .has-children.expanded .sub-menu { display: block; }
+    .main-nav ul { gap: 10px; }
 }
 
 /* Prevent main content from shifting under fixed header on small screens */
@@ -592,4 +626,156 @@ a {
 .article-content p {
     margin-bottom: 25px;
     text-align: justify;
+}
+/* --- Cải tiến Header --- */
+
+/* Logo và Top bar */
+.top-bar .logo a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    color: #0056b3;
+}
+.top-menu ul {
+    gap: 20px;
+}
+
+/* Form tìm kiếm đẹp hơn */
+.search-form {
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    overflow: hidden;
+}
+.search-form input {
+    border: none;
+    padding: 6px 12px;
+    font-size: 14px;
+    outline: none;
+}
+.search-form button {
+    border: none;
+    background: #f0f0f0;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: #555;
+}
+.search-form button:hover {
+    background: #e0e0e0;
+}
+
+/* Menu chính */
+.main-nav {
+    border-top: none; /* Bỏ border cũ */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Thêm đổ bóng nhẹ */
+}
+.main-nav li a {
+    font-size: 14px;
+    padding: 12px 18px;
+}
+
+/* Thêm hiệu ứng cho menu active và hover */
+.main-nav li.active a {
+    background-color: #d90000;
+    color: #fff;
+}
+.main-nav li a:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Menu con */
+.main-nav .sub-menu {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    border-top: 2px solid #d90000;
+}
+.main-nav .sub-menu li a {
+    font-size: 13px;
+    text-transform: none;
+}
+.main-nav .sub-menu li a:hover {
+    background-color: #d90000;
+}
+/* --- CSS cho Khối Tin Tức Chuyên Mục (Bóng Đá) --- */
+.category-showcase-block {
+    margin-top: 40px;
+}
+.category-showcase-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #78B43D;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+.category-showcase-header .category-title {
+    font-size: 22px;
+    text-transform: uppercase;
+    color: #78B43D;
+    margin-right: 25px;
+}
+.sub-category-nav {
+    display: flex;
+    gap: 20px;
+}
+.sub-category-nav a {
+    font-size: 15px;
+    color: #333;
+    font-weight: 500;
+}
+.sub-category-nav a:hover {
+    color: #d90000;
+}
+
+/* Tin chính ở trên */
+.showcase-top-story {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.showcase-top-story .story-image {
+    flex: 0 0 40%;
+}
+.showcase-top-story img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.showcase-top-story .story-content h3 {
+    font-size: 24px;
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+}
+.showcase-top-story .story-content h3 a {
+    color: #222;
+}
+.showcase-top-story .story-content p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* 3 tin phụ ở dưới */
+.showcase-bottom-stories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+.story-small .story-image img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+.story-small h4 {
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+.story-small h4 a {
+    color: #333;
 }
