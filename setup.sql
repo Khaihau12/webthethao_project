@@ -1,64 +1,100 @@
-CREATE DATABASE IF NOT EXISTS `webthethao`;  
+-- ===================================================================================
+-- SCRIPT CÀI ĐẶT DATABASE WEBTHETHAO - PHIÊN BẢN HOÀN CHỈNH VÀ ĐA DẠNG
+-- Tự động xóa database cũ nếu tồn tại để tránh xung đột.
+-- ===================================================================================
+
+-- XÓA DATABASE CŨ NẾU TỒN TẠI VÀ TẠO MỚI
+DROP DATABASE IF EXISTS `webthethao`;
+CREATE DATABASE `webthethao` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `webthethao`;
 
--- Bảng lưu trữ tin tức chính
-CREATE TABLE IF NOT EXISTS `articles` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `category` VARCHAR(50) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `slug` VARCHAR(255) UNIQUE,           -- Đường dẫn thân thiện
-    `summary` TEXT,
-    `content` TEXT,                       -- Nội dung chi tiết
-    `image_url` VARCHAR(255),
-    `is_featured` BOOLEAN DEFAULT FALSE,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- --------------------------------------------------------
 
--- Bảng lưu trữ các ảnh được chèn bên trong bài viết (tạo trước khi chèn dữ liệu ảnh)
-CREATE TABLE IF NOT EXISTS `article_images` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `article_id` INT NOT NULL,
-    `file_path` VARCHAR(255) NOT NULL,
-    `caption` VARCHAR(255) DEFAULT NULL,
-    `alt_text` VARCHAR(255) DEFAULT NULL,
-    `position_key` VARCHAR(50) DEFAULT NULL,
-    `display_order` INT DEFAULT 0,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX (`article_id`),
-    CONSTRAINT `fk_article_images_article` FOREIGN KEY (`article_id`) REFERENCES `articles`(`id`) ON DELETE CASCADE
-);
+--
+-- Bảng Chuyên mục (Categories)
+--
+CREATE TABLE `categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name` varchar(100) NOT NULL,
+  `slug` varchar(120) UNIQUE NOT NULL,
+  `parent_id` int(11) DEFAULT NULL,
+  FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Bảng Bài viết (Articles)
+--
+CREATE TABLE `articles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `category_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `slug` varchar(255) UNIQUE NOT NULL,
+  `summary` text,
+  `content` text,
+  `image_url` varchar(255) DEFAULT NULL,
+  `is_featured` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Dữ liệu mẫu
-INSERT INTO `articles` (`category`, `title`, `slug`, `summary`, `content`, `is_featured`, `image_url`) VALUES
-('Thời sự', 'Nữ tài xế ô tô 7 chỗ tông tử vong chủ tịch xã sẽ phải đối diện mức án nào?', 'nu-tai-xe-tong-tu-vong-chu-tich-xa', 'Nội dung tóm tắt về vụ việc nữ tài xế gây tai nạn nghiêm trọng.', 'Sáng 4/10, UBND xã Đắk Lắk đã có báo cáo nhanh về vụ việc...', FALSE, 'assets/map_image.jpg'),
-('Thế giới', 'Siêu bão tạo sóng thần 12 mét, khiến hơn 200.000 người thiệt mạng', 'sieu-bao-song-than-200-nghin-nguoi-thiet-mang', 'Thiệt hại kinh hoàng từ cơn siêu bão lịch sử đổ bộ vào khu vực Đông Nam Á.', 'Nội dung chi tiết của bài báo 2...', FALSE, 'assets/market_news_2.jpg'),
-('Kinh Doanh', 'Giá vàng hôm nay 6-10: Vừa mở cửa, đồng loạt tăng mạnh', 'gia-vang-hom-nay-6-10-tang-manh', 'Giá vàng thế giới và trong nước có những diễn biến tích cực ngay đầu phiên giao dịch.', 'Nội dung chi tiết của bài báo 3...', FALSE, 'assets/market_news_1.jpg'),
-('Giải trí', 'NSND Trần Hiếu: Người nghệ sĩ tài hoa và những lần dặn cưới đời', 'nsnd-tran-hieu-dam-cuoi', 'Những câu chuyện thú vị về cuộc sống và sự nghiệp của nghệ sĩ nhân dân Trần Hiếu.', 'Nội dung chi tiết của bài báo 4...', FALSE, 'assets/market_news_3.jpg'),
-('Thị Trường', 'Bão Matmo đã suy yếu thành áp thấp nhiệt đới', 'bao-matmo-suy-yeu-ap-thap-nhiet-doi', 'Theo Trung tâm Dự báo Khí tượng Thủy văn Quốc gia...', 'Theo Trung tâm Dự báo Khí tượng Thủy văn Quốc gia, sáng nay (6/10), sau khi đi sâu vào đất liền tỉnh Quảng Tây (Trung Quốc), bão số 11 đã suy yếu thành áp thấp nhiệt đới.
-Theo Trung tâm Dự báo Khí tượng Thủy văn Quốc gia, sáng nay (6/10), sau khi đi sâu vào đất liền tỉnh Quảng Tây (Trung Quốc), bão số 11 đã suy yếu thành áp thấp nhiệt đới.
+--
 
-Hồi 7 giờ ngày 6/10, vị trí tâm áp thấp nhiệt đới ở vào khoảng 22,0 độ Vĩ Bắc; 107,1 độ Kinh Đông, trên khu vực phía Nam tỉnh Quảng Tây (Trung Quốc). Sức gió mạnh nhất vùng gần tâm áp thấp nhiệt đới mạnh cấp 7 (50-61km/giờ), giật cấp 9. Di chuyển theo hướng Tây, tốc độ 20-25km/h.
-Hồi 19 giờ ngày 6/10, vị trí tâm bão ở khoảng 22,5 độ Vĩ Bắc; 104,8 độ Kinh Đông, trên khu vực vùng núi Bắc Bộ.Bão di chuyển theo hướng Tây Tây Bắc với tốc độ 20–25km/h và suy yếu dần thành vùng áp thấp (cấp <6).Phạm vi ảnh hưởng cảnh báo cấp 3: gồm khu vực Bắc Vịnh Bắc Bộ, đất liền các tỉnh Quảng Ninh và Lạng Sơn, nằm phía Bắc vĩ tuyến 20,0°N và phía Tây kinh tuyến 109,0°E.
+INSERT INTO `categories` (`id`, `name`, `slug`, `parent_id`) VALUES
+(1, 'Thể thao', 'the-thao', NULL),
+(2, 'Kinh doanh', 'kinh-doanh', NULL),
+(3, 'Thế giới', 'the-gioi', NULL),
+(4, 'Giải trí', 'giai-tri', NULL),
+(5, 'Bóng đá', 'bong-da', 1),
+(6, 'Quần vợt', 'quan-vot', 1),
+(7, 'Đua xe', 'dua-xe', 1),
+(8, 'Thị trường', 'thi-truong', 2),
+(9, 'Startup', 'startup', 2),
+(10, 'Video', 'video', NULL),
+(11, 'Điện ảnh', 'dien-anh', 4),
+(12, 'Âm nhạc', 'am-nhac', 4),
+(13, 'Công nghệ', 'cong-nghe', NULL),
+(14, 'Du lịch', 'du-lich', NULL);
 
-Trong sáng nay (6/10), khu vực Bắc vịnh Bắc Bộ (bao gồm đặc khu Bạch Long Vỹ) gió mạnh cấp 6, giật cấp 8, sóng biển cao 2,0-3,0m, biển động (nguy hiểm đối với tàu thuyền).
+INSERT INTO `articles` (`category_id`, `title`, `slug`, `summary`, `content`, `is_featured`, `image_url`) VALUES
+-- Tin nổi bật
+(5, 'Mbappe chính thức gia nhập Real Madrid với hợp đồng 5 năm', 'mbappe-gia-nhap-real-madrid', 'Sau nhiều năm chờ đợi, cuối cùng siêu sao người Pháp Kylian Mbappe đã trở thành người của Real Madrid.', 'Đây là một bản hợp đồng thế kỷ, hứa hẹn sẽ thay đổi cán cân quyền lực của bóng đá châu Âu trong nhiều năm tới.', 1, 'assets/market_news_3.jpg'),
 
-Trên đất liền, trong sáng nay (6/10), khu vực Quảng Ninh và Lạng Sơn có gió mạnh cấp 5, có nơi cấp 6, giật cấp 7-8.
+-- Tin Thể thao
+(5, 'Kết quả V-League: HAGL chia điểm kịch tính với Hà Nội FC', 'ket-qua-vleague-hagl-hanoi', 'Trận cầu tâm điểm vòng 15 V-League đã diễn ra vô cùng hấp dẫn với màn rượt đuổi tỷ số ngoạn mục.', 'Chi tiết trận đấu...', 0, 'assets/placeholder.jpg'),
+(6, 'Carlos Alcaraz giành chức vô địch Wimbledon sau trận chung kết nghẹt thở', 'alcaraz-vo-dich-wimbledon', 'Tay vợt trẻ người Tây Ban Nha đã xuất sắc đánh bại đối thủ kỳ cựu để lần đầu tiên lên ngôi tại Wimbledon.', 'Diễn biến trận chung kết...', 0, 'assets/placeholder.jpg'),
+(7, 'Verstappen về nhất tại Grand Prix Monaco', 'verstappen-ve-nhat-monaco-gp', 'Max Verstappen tiếp tục thể hiện phong độ hủy diệt khi không cho các đối thủ một cơ hội nào.', 'Chi tiết cuộc đua...', 0, 'assets/placeholder.jpg'),
+(1, 'Lịch thi đấu Euro 2028 hôm nay', 'lich-thi-dau-euro-2028', 'Cập nhật lịch thi đấu, kênh trực tiếp các trận đấu trong khuôn khổ vòng chung kết Euro 2028.', 'Chi tiết lịch thi đấu...', 0, 'assets/market_news_4.jpg'),
+(5, 'Phân tích chiến thuật: Liverpool đã vô hiệu hóa Man City như thế nào?', 'phan-tich-chien-thuat-liverpool-mancity', 'HLV Jurgen Klopp đã một lần nữa cho thấy tài năng của mình với một thế trận phòng ngự phản công bậc thầy.', 'Chi tiết phân tích...', 0, 'assets/market_news_2.jpg'),
+(6, 'Federer và Nadal: Nhìn lại cuộc đối đầu vĩ đại nhất lịch sử quần vợt', 'federer-nadal-cuoc-doi-dau-vi-dai', 'Họ không chỉ là đối thủ, họ còn là những người bạn và là nguồn cảm hứng cho hàng triệu người hâm mộ.', 'Những khoảnh khắc đáng nhớ...', 0, 'assets/placeholder.jpg'),
 
-Từ sáng 6/10 đến hết đêm 7/10, ở khu vực vùng núi, trung du Bắc Bộ có mưa to và dông, lượng mưa phổ biến từ 100-200mm, cục bộ có nơi mưa rất to trên 300mm. Cảnh báo nguy cơ mưa có cường suất lớn (>150mm/3h); khu vực Đồng Bằng Bắc Bộ, Thanh Hóa có mưa vừa, mưa to với lượng mưa phổ biến 50-150mm, cục bộ có nơi mưa rất to trên 200mm.
+-- Tin Kinh doanh
+(8, 'VN-Index vượt mốc 1300 điểm', 'vnindex-vuot-1300-diem', 'Thị trường chứng khoán Việt Nam có một phiên giao dịch bùng nổ, chỉ số VN-Index đã vượt qua ngưỡng cản tâm lý quan trọng.', 'Phân tích thị trường...', 0, 'assets/market_news_1.jpg'),
+(9, 'Startup Việt huy động thành công 10 triệu USD vòng series A', 'startup-viet-goi-von-10-trieu-usd', 'Công ty công nghệ giáo dục Edutech vừa công bố hoàn tất vòng gọi vốn series A do các quỹ đầu tư lớn trong khu vực dẫn dắt.', 'Thông tin về startup...', 0, 'assets/placeholder.jpg'),
+(8, 'Bitcoin biến động mạnh, nhà đầu tư nên làm gì?', 'bitcoin-bien-dong-manh', 'Thị trường tiền điện tử đang trải qua một giai đoạn đầy biến động, đòi hỏi các nhà đầu tư phải hết sức cẩn trọng.', 'Lời khuyên từ chuyên gia...', 0, 'assets/market_news_1.jpg'),
+(2, 'Lãi suất ngân hàng dự báo sẽ tiếp tục tăng nhẹ', 'lai-suat-ngan-hang-tang-nhe', 'Ngân hàng nhà nước có thể sẽ có những điều chỉnh chính sách tiền tệ để kiểm soát lạm phát.', 'Phân tích từ các chuyên gia kinh tế...', 0, 'assets/placeholder.jpg'),
 
-Khu vực Hà Nội cần đề phòng dông, lốc và gió giật mạnh. Dự báo từ sáng 6/10 đến hết ngày 7/10 có mưa vừa, mưa to và dông, với lượng mưa phổ biến 50-100mm, cục bộ có nơi trên 150mm. Trong mưa dông có khả năng xảy ra lốc, sét và gió giật mạnh', TRUE, 'assets/market_news_4.jpg');
+-- Tin Thế giới
+(3, 'Hội nghị thượng đỉnh G7 bàn về các vấn đề khí hậu và an ninh toàn cầu', 'hoi-nghi-g7-khi-hau-an-ninh', 'Các nhà lãnh đạo của 7 nền kinh tế phát triển nhất thế giới đã nhóm họp tại Canada.', 'Nội dung chính của hội nghị...', 0, 'assets/placeholder.jpg'),
+(3, 'NASA công bố kế hoạch đưa người trở lại Mặt Trăng vào năm 2028', 'nasa-tro-lai-mat-trang-2028', 'Chương trình Artemis hứa hẹn sẽ mở ra một kỷ nguyên mới cho việc khám phá không gian của nhân loại.', 'Chi tiết kế hoạch...', 0, 'assets/placeholder.jpg'),
 
--- Chèn token ảnh bản đồ ngay sau đoạn nêu vị trí lúc 7 giờ; token [IMAGE:storm-map] sẽ được inject thành <img> khi hiển thị
-UPDATE articles SET content = REPLACE(content, 'Hồi 7 giờ ngày 6/10, vị trí tâm áp thấp nhiệt đới ở vào khoảng 22,0 độ Vĩ Bắc; 107,1 độ Kinh Đông, trên khu vực phía Nam tỉnh Quảng Tây (Trung Quốc). Sức gió mạnh nhất vùng gần tâm áp thấp nhiệt đới mạnh cấp 7 (50-61km/giờ), giật cấp 9. Di chuyển theo hướng Tây, tốc độ 20-25km/h.', CONCAT('Hồi 7 giờ ngày 6/10, vị trí tâm áp thấp nhiệt đới ở vào khoảng 22,0 độ Vĩ Bắc; 107,1 độ Kinh Đông, trên khu vực phía Nam tỉnh Quảng Tây (Trung Quốc). Sức gió mạnh nhất vùng gần tâm áp thấp nhiệt đới mạnh cấp 7 (50-61km/giờ), giật cấp 9. Di chuyển theo hướng Tây, tốc độ 20-25km/h.', '\n\n[IMAGE:storm-map]')) WHERE slug = 'bao-matmo-suy-yeu-ap-thap-nhiet-doi';
+-- Tin Công nghệ
+(13, 'Apple ra mắt iPhone 18 với chip A20 Bionic và màn hình ProMotion 2.0', 'apple-ra-mat-iphone-18', 'Gã khổng lồ công nghệ vừa trình làng thế hệ iPhone mới với nhiều nâng cấp đáng giá về hiệu năng và camera.', 'Chi tiết về sản phẩm...', 0, 'assets/placeholder.jpg'),
+(13, 'Cuộc đua phát triển AI tạo sinh: OpenAI, Google và những kẻ thách thức', 'cuoc-dua-ai-tao-sinh', 'Trí tuệ nhân tạo tạo sinh đang là chiến trường khốc liệt nhất của các ông lớn công nghệ.', 'Phân tích cuộc đua công nghệ...', 0, 'assets/placeholder.jpg'),
 
--- Thêm bản ghi ảnh cho token storm-map (article_id = 5 theo thứ tự INSERTs ở trên)
-INSERT INTO article_images (article_id, file_path, caption, alt_text, position_key, display_order) VALUES
-(5, 'assets/map_image.jpg', 'Bản đồ đường đi và vùng ảnh hưởng của bão số 11', 'Bản đồ đường đi bão số 11', 'storm-map', 0);
+-- Tin Giải trí
+(11, 'Review phim "Dune 2": Siêu phẩm điện ảnh xứng đáng với mọi lời khen', 'review-dune-2', 'Denis Villeneuve một lần nữa đã không làm khán giả thất vọng với một tác phẩm hoành tráng và sâu sắc.', 'Đánh giá chi tiết bộ phim...', 0, 'assets/placeholder.jpg'),
+(12, 'Album mới của Sơn Tùng M-TP phá vỡ nhiều kỷ lục nhạc số', 'son-tung-mtp-album-moi-ky-luc', 'Sản phẩm âm nhạc mới nhất của nam ca sĩ đã nhanh chóng chiếm lĩnh các bảng xếp hạng trong và ngoài nước.', 'Thành tích của album...', 0, 'assets/market_news_2.jpg'),
+(11, 'Phim "Lật Mặt 7" của Lý Hải đạt doanh thu 500 tỷ đồng', 'lat-mat-7-doanh-thu-500-ty', 'Tác phẩm mới nhất của đạo diễn Lý Hải tiếp tục tạo nên một cơn sốt phòng vé chưa từng có tại Việt Nam.', 'Chi tiết về thành công của bộ phim...', 0, 'assets/placeholder.jpg'),
+(12, 'Blackpink công bố tour diễn toàn cầu, có điểm dừng tại Việt Nam', 'blackpink-tour-toan-cau-viet-nam', 'Cộng đồng Blink Việt Nam đang vỡ òa trước thông tin nhóm nhạc nữ hàng đầu thế giới sẽ biểu diễn tại sân vận động Mỹ Đình.', 'Chi tiết về concert...', 0, 'assets/market_news_3.jpg'),
 
--- Thêm vài bản ghi mẫu cho mục Video và Tin nóng để hiển thị ở sidebar và các khối khác
-INSERT INTO `articles` (`category`, `title`, `slug`, `summary`, `content`, `is_featured`, `image_url`) VALUES
-('Video', 'Tổng hợp bàn thắng vòng 7 V-League', 'video-banthang-vleague-vong-7', 'Những pha lập công đẹp của vòng 7.', 'Video tổng hợp...', FALSE, 'assets/map_image.jpg'),
-('Tin nóng', 'Tai nạn giao thông nghiêm trọng trên cao tốc', 'tai-nan-cao-toc', 'Thông tin ban đầu về vụ tai nạn...', 'Chi tiết vụ việc...', FALSE, 'assets/placeholder.jpg');
+-- Tin Du lịch
+(14, 'Top 5 địa điểm phải đến ở Hà Giang mùa lúa chín', 'top-5-dia-diem-ha-giang', 'Hà Giang tháng 9, tháng 10 đẹp như một bức tranh thủy mặc với những thửa ruộng bậc thang vàng óng.', 'Gợi ý lịch trình...', 0, 'assets/placeholder.jpg'),
+(14, 'Kinh nghiệm du lịch Phú Quốc tự túc cho người mới đi lần đầu', 'kinh-nghiem-du-lich-phu-quoc', 'Tất tần tật những gì bạn cần biết về di chuyển, ăn ở, vui chơi tại Đảo Ngọc.', 'Hướng dẫn chi tiết...', 0, 'assets/placeholder.jpg'),
 
--- Bảng lưu trữ các ảnh được chèn bên trong bài viết
--- ...existing file...
+-- Tin Video
+(10, 'Video: Top 5 bàn thắng đẹp nhất tuần qua', 'video-top-5-ban-thang-dep', 'Cùng chiêm ngưỡng lại những siêu phẩm làm nức lòng người hâm mộ trên khắp các sân cỏ thế giới.', 'Video tổng hợp...', 0, 'assets/placeholder.jpg'),
+(10, 'Video: Khám phá hang Sơn Đoòng - kỳ quan thiên nhiên của thế giới', 'video-kham-pha-son-doong', 'Những thước phim ngoạn mục ghi lại vẻ đẹp hùng vĩ và choáng ngợp bên trong hang động lớn nhất thế giới.', 'Video du lịch khám phá...', 0, 'assets/placeholder.jpg');
