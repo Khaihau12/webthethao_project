@@ -5,7 +5,7 @@ class Database {
     private $conn;
 
     private function __construct() {
-        $this->conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        $this->conn = new mysqli("dpg-d3jmool6ubrc73cv4qm0-a", "project_141i_user", "57LJ3gV9jFPNb1gB8W0aq1TTI9tTyzZ8", "project");
 
         if ($this->conn->connect_error) {
             die("Kết nối database thất bại: " . $this->conn->connect_error);
