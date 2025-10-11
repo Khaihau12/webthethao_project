@@ -47,5 +47,62 @@ class CategoryRepository {
         $stmt->close();
         return $children;
     }
+
+    // ================
+    // CRUD cho quản trị
+    // ================
+    public function listAll($limit = 100, $offset = 0) {
+        $sql = "SELECT id, name, slug, parent_id FROM categories ORDER BY parent_id, name LIMIT ? OFFSET ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return [];
+        $stmt->bind_param('ii', $limit, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $cats = [];
+        while ($row = $result->fetch_assoc()) {
+            $cats[] = $row;
+        }
+        $stmt->close();
+        return $cats;
+    }
+
+    public function create($name, $slug, $parent_id = null) {
+        $sql = "INSERT INTO categories (name, slug, parent_id) VALUES (?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return false;
+        if ($parent_id === '' || $parent_id === null) {
+            $null = null;
+            $stmt->bind_param('ssi', $name, $slug, $null);
+        } else {
+            $pid = (int)$parent_id;
+            $stmt->bind_param('ssi', $name, $slug, $pid);
+        }
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
+    public function update($id, $name, $slug, $parent_id = null) {
+        $sql = "UPDATE categories SET name = ?, slug = ?, parent_id = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return false;
+        $pid = ($parent_id === '' || $parent_id === null) ? null : (int)$parent_id;
+        $id = (int)$id;
+        $stmt->bind_param('ssii', $name, $slug, $pid, $id);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
+    public function delete($id) {
+        $sql = "DELETE FROM categories WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return false;
+        $id = (int)$id;
+        $stmt->bind_param('i', $id);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
 }
 ?>
