@@ -101,5 +101,70 @@ class ArticleRepository {
             'sub_articles' => $sub_articles
         ];
     }
+
+    // =====================
+    // CRUD cho trang quản trị
+    // =====================
+    public function listAll($limit = 50, $offset = 0, $search = '') {
+        $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug
+                FROM articles a JOIN categories c ON a.category_id = c.id";
+        $params = [];
+        $types = '';
+        if ($search !== '') {
+            $sql .= " WHERE a.title LIKE ?";
+            $params[] = '%' . $search . '%';
+            $types .= 's';
+        }
+        $sql .= " ORDER BY a.created_at DESC LIMIT ? OFFSET ?";
+        $params[] = $limit; $types .= 'i';
+        $params[] = $offset; $types .= 'i';
+        return $this->fetchArticles($sql, $params, $types);
+    }
+
+    public function create($data) {
+        $sql = "INSERT INTO articles (category_id, title, slug, summary, content, image_url, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return false;
+        $category_id = (int)$data['category_id'];
+        $title = $data['title'];
+        $slug = $data['slug'];
+        $summary = $data['summary'] ?? null;
+        $content = $data['content'] ?? null;
+        $image_url = $data['image_url'] ?? null;
+        $is_featured = !empty($data['is_featured']) ? 1 : 0;
+        $stmt->bind_param('isssssi', $category_id, $title, $slug, $summary, $content, $image_url, $is_featured);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
+    public function update($id, $data) {
+        $sql = "UPDATE articles SET category_id = ?, title = ?, slug = ?, summary = ?, content = ?, image_url = ?, is_featured = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return false;
+        $category_id = (int)$data['category_id'];
+        $title = $data['title'];
+        $slug = $data['slug'];
+        $summary = $data['summary'] ?? null;
+        $content = $data['content'] ?? null;
+        $image_url = $data['image_url'] ?? null;
+        $is_featured = !empty($data['is_featured']) ? 1 : 0;
+        $id = (int)$id;
+        $stmt->bind_param('isssssii', $category_id, $title, $slug, $summary, $content, $image_url, $is_featured, $id);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
+    public function delete($id) {
+        $sql = "DELETE FROM articles WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return false;
+        $id = (int)$id;
+        $stmt->bind_param('i', $id);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
 }
 ?>
