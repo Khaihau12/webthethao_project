@@ -183,4 +183,5 @@ $kinh_doanh_articles = $articleRepo->getArticlesByCategorySlug('kinh-doanh', 4);
     </div>
 </body>
 </html>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
 <?php $conn->close(); ?>
