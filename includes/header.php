@@ -3,12 +3,16 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/CategoryRepository.php';
+require_once __DIR__ . '/../classes/Auth.php';
 
 // Chỉ khởi tạo kết nối CSDL một lần
 if (!isset($conn) || !$conn->ping()) {
     $db = Database::getInstance();
     $conn = $db->getConnection();
 }
+// Khởi tạo Auth để biết tình trạng đăng nhập
+$auth = new Auth($conn);
+$current_user = $auth->currentUser();
 
 // Lấy categories cho menu chính
 $categoryRepo = new CategoryRepository($conn);
@@ -37,6 +41,16 @@ foreach ($all_categories as $cat) {
                         <button type="submit" style="border:none; background:transparent; padding:0; margin-left:6px;"><i class="fa fa-search"></i></button>
                     </form>
                 </li>
+                <li>
+                    <?php if ($current_user): ?>
+                        <a href="<?php echo BASE_URL; ?>/account.php">Tài khoản</a>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL; ?>/user_login.php">Đăng nhập</a>
+                    <?php endif; ?>
+                </li>
+                <?php if (!$current_user): ?>
+                <li><a href="<?php echo BASE_URL; ?>/user_register.php">Đăng ký</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
     </div>
