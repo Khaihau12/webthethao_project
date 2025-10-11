@@ -70,5 +70,6 @@ $category_name = !empty($articles_in_category)
 </body>
 </html>
 <?php
+$__footer = __DIR__ . '/includes/footer.php'; if (file_exists($__footer)) require $__footer;
 $conn->close();
 ?>
