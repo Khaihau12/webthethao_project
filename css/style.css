@@ -621,6 +621,8 @@ a {
     font-size: 17px;
     line-height: 1.7;
     color: #222;
+    /* Prevent any embedded content from forcing horizontal scroll */
+    overflow-x: hidden;
 }
 
 .article-content p {
@@ -779,3 +781,25 @@ a {
 .story-small h4 a {
     color: #333;
 }
+
+/* --------------------------------------
+    Responsive content inside article body
+    -------------------------------------- */
+.article-body { overflow-wrap: anywhere; word-break: break-word; }
+/* Enforce container-fit for images, even if editor sets inline width/height */
+.article-body img,
+.article-content img { max-width: 100% !important; height: auto !important; display: block; margin: 8px auto; }
+/* Videos and iframes scale to container width */
+.article-body iframe,
+.article-body video,
+.article-content iframe,
+.article-content video { max-width: 100% !important; width: 100% !important; height: auto; display: block; margin: 8px auto; }
+/* Tables should not overflow horizontally */
+.article-body table,
+.article-content table { width: 100% !important; border-collapse: collapse; }
+.article-body table th,
+.article-body table td,
+.article-content table th,
+.article-content table td { border: 1px solid #eee; padding: 6px 8px; }
+.article-body figure,
+.article-content figure { margin: 0 0 12px 0; max-width: 100% !important; }
