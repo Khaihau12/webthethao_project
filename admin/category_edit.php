@@ -8,7 +8,7 @@ require_once __DIR__ . '/../classes/Helpers.php';
 $db = Database::getInstance();
 $conn = $db->getConnection();
 $auth = new Auth($conn);
-$auth->requireAdmin();
+$auth->requireAdminOrEditor();
 
 $repo = new CategoryRepository($conn);
 $all = $repo->listAll(1000, 0);
