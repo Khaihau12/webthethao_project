@@ -13,6 +13,7 @@ $db = Database::getInstance();
 $conn = $db->getConnection();
 $auth = new Auth($conn);
 $auth->requireAdminOrEditor();
+$current = $auth->currentUser();
 
 $articleRepo = new ArticleRepository($conn);
 $categoryRepo = new CategoryRepository($conn);
@@ -57,7 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
       $oldFiles = array_values(array_unique(array_filter($oldFiles)));
     }
-        $data = compact('category_id','title','slug','summary','content','image_url','is_featured');
+  $data = compact('category_id','title','slug','summary','content','image_url','is_featured');
+  // Assign author_id
+  $data['author_id'] = $current ? (int)$current->id : null;
         if ($id > 0) {
             $ok = $articleRepo->update($id, $data);
         } else {
