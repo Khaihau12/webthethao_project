@@ -24,16 +24,20 @@ class ArticleRepository {
     }
 
     public function getFeaturedArticle() {
-        $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug
+        $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug,
+                       u.id AS author_id, u.username AS author_username, COALESCE(u.display_name, u.username) AS author_name
                 FROM articles a JOIN categories c ON a.category_id = c.id
+                LEFT JOIN users u ON a.author_id = u.id
                 WHERE a.is_featured = 1 ORDER BY a.created_at DESC LIMIT 1";
         $articles = $this->fetchArticles($sql);
         return !empty($articles) ? $articles[0] : null;
     }
 
     public function getLatestArticles($limit = 10, $exclude_featured = true) {
-        $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug
-                FROM articles a JOIN categories c ON a.category_id = c.id ";
+    $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug,
+               u.id AS author_id, u.username AS author_username, COALESCE(u.display_name, u.username) AS author_name
+        FROM articles a JOIN categories c ON a.category_id = c.id 
+        LEFT JOIN users u ON a.author_id = u.id ";
         if ($exclude_featured) {
             $sql .= "WHERE a.is_featured = 0 ";
         }
@@ -74,8 +78,10 @@ class ArticleRepository {
     }
 
     public function getArticleBySlug($slug) {
-        $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug
-                FROM articles a JOIN categories c ON a.category_id = c.id
+    $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug,
+               u.id AS author_id, u.username AS author_username, COALESCE(u.display_name, u.username) AS author_name
+        FROM articles a JOIN categories c ON a.category_id = c.id
+        LEFT JOIN users u ON a.author_id = u.id
                 WHERE a.slug = ? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) return null;
@@ -106,8 +112,10 @@ class ArticleRepository {
     // CRUD cho trang quản trị
     // =====================
     public function listAll($limit = 50, $offset = 0, $search = '') {
-        $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug
-                FROM articles a JOIN categories c ON a.category_id = c.id";
+    $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug,
+               u.id AS author_id, u.username AS author_username, COALESCE(u.display_name, u.username) AS author_name
+        FROM articles a JOIN categories c ON a.category_id = c.id
+        LEFT JOIN users u ON a.author_id = u.id";
         $params = [];
         $types = '';
         if ($search !== '') {
@@ -122,7 +130,7 @@ class ArticleRepository {
     }
 
     public function create($data) {
-        $sql = "INSERT INTO articles (category_id, title, slug, summary, content, image_url, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO articles (category_id, title, slug, summary, content, image_url, is_featured, author_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) return false;
         $category_id = (int)$data['category_id'];
@@ -132,14 +140,15 @@ class ArticleRepository {
         $content = $data['content'] ?? null;
         $image_url = $data['image_url'] ?? null;
         $is_featured = !empty($data['is_featured']) ? 1 : 0;
-        $stmt->bind_param('isssssi', $category_id, $title, $slug, $summary, $content, $image_url, $is_featured);
+        $author_id = isset($data['author_id']) ? (int)$data['author_id'] : null;
+        $stmt->bind_param('isssssii', $category_id, $title, $slug, $summary, $content, $image_url, $is_featured, $author_id);
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;
     }
 
     public function update($id, $data) {
-        $sql = "UPDATE articles SET category_id = ?, title = ?, slug = ?, summary = ?, content = ?, image_url = ?, is_featured = ? WHERE id = ?";
+        $sql = "UPDATE articles SET category_id = ?, title = ?, slug = ?, summary = ?, content = ?, image_url = ?, is_featured = ?, author_id = ? WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) return false;
         $category_id = (int)$data['category_id'];
@@ -150,7 +159,8 @@ class ArticleRepository {
         $image_url = $data['image_url'] ?? null;
         $is_featured = !empty($data['is_featured']) ? 1 : 0;
         $id = (int)$id;
-        $stmt->bind_param('isssssii', $category_id, $title, $slug, $summary, $content, $image_url, $is_featured, $id);
+        $author_id = isset($data['author_id']) ? (int)$data['author_id'] : null;
+        $stmt->bind_param('isssssiii', $category_id, $title, $slug, $summary, $content, $image_url, $is_featured, $author_id, $id);
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;
