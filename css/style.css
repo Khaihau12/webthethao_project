@@ -32,6 +32,18 @@ a {
     transition: color 0.2s;
 }
 
+/* Make links inside article content visible and recognizable */
+.article-content a,
+.article-body a {
+    color: #4183c4; /* readable blue */
+    text-decoration: underline;
+}
+.article-content a:hover,
+.article-body a:hover {
+    color: #d90000; /* brand red on hover */
+    text-decoration: underline;
+}
+
 /* Biến màu sắc */
 .color-main { color: #333; }
 .color-24h { color: #d90000; } /* Màu đỏ chủ đạo */
@@ -629,6 +641,32 @@ a {
     margin-bottom: 25px;
     text-align: justify;
 }
+
+/* Honor editor alignment classes/styles inside article content */
+/* Quill alignment classes */
+.article-content .ql-align-left { text-align: left !important; }
+.article-content .ql-align-center { text-align: center !important; }
+.article-content .ql-align-right { text-align: right !important; }
+.article-content .ql-align-justify { text-align: justify !important; }
+/* Ensure nested inline elements inherit the alignment visually */
+.article-content .ql-align-left *,
+.article-content .ql-align-center *,
+.article-content .ql-align-right *,
+.article-content .ql-align-justify * { text-align: inherit !important; }
+
+/* TinyMCE common alignment classes for blocks */
+.article-content .alignleft { text-align: left !important; }
+.article-content .aligncenter { text-align: center !important; }
+.article-content .alignright { text-align: right !important; }
+
+/* Image alignment handling (Quill classes on parent or TinyMCE classes on img) */
+.article-content .ql-align-left img { margin-left: 0 !important; margin-right: auto !important; }
+.article-content .ql-align-center img { margin-left: auto !important; margin-right: auto !important; }
+.article-content .ql-align-right img { margin-left: auto !important; margin-right: 0 !important; }
+.article-content img.alignleft { display: block; margin: 8px 16px 8px 0 !important; float: left; }
+.article-content img.alignright { display: block; margin: 8px 0 8px 16px !important; float: right; }
+.article-content img.aligncenter { display: block; margin-left: auto !important; margin-right: auto !important; float: none; }
+.article-content::after { content: ""; display: table; clear: both; }
 /* --- Cải tiến Header --- */
 
 /* Logo và Top bar */
