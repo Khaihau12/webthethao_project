@@ -56,25 +56,32 @@ foreach ($all_categories as $cat) {
     </div>
 </header>
 
+<?php
+// Lấy tên file hiện tại để xác định menu active
+$current_page = basename($_SERVER['PHP_SELF']);
+$current_slug = $_GET['slug'] ?? '';
+?>
 <nav class="main-nav">
     <div class="container">
         <ul>
-            <li><a href="index.php" class="active"><i class="fa fa-home"></i> TRANG CHỦ</a></li>
+            <li><a href="index.php" class="<?php echo ($current_page == 'index.php') ? 'active' : ''; ?>"><i class="fa fa-home"></i> TRANG CHỦ</a></li>
             <?php
             // Hiển thị menu cấp 1
             foreach ($category_map[0] ?? [] as $top_cat) {
                 $children = $category_map[$top_cat['id']] ?? [];
+                $is_active = ($current_page == 'category.php' && $current_slug == $top_cat['slug']) ? 'active' : '';
                 
                 if (empty($children)) {
                     // Menu không có menu con
-                    echo '<li><a href="category.php?slug=' . htmlspecialchars($top_cat['slug']) . '">' . htmlspecialchars(strtoupper($top_cat['name'])) . '</a></li>';
+                    echo '<li><a href="category.php?slug=' . htmlspecialchars($top_cat['slug']) . '" class="' . $is_active . '">' . htmlspecialchars(strtoupper($top_cat['name'])) . '</a></li>';
                 } else {
                     // Menu có menu con
                     echo '<li class="has-children">';
-                    echo '<a href="category.php?slug=' . htmlspecialchars($top_cat['slug']) . '">' . htmlspecialchars(strtoupper($top_cat['name'])) . '</a>';
+                    echo '<a href="category.php?slug=' . htmlspecialchars($top_cat['slug']) . '" class="' . $is_active . '">' . htmlspecialchars(strtoupper($top_cat['name'])) . '</a>';
                     echo '<ul class="sub-menu">';
                     foreach ($children as $child_cat) {
-                        echo '<li><a href="category.php?slug=' . htmlspecialchars($child_cat['slug']) . '">' . htmlspecialchars($child_cat['name']) . '</a></li>';
+                        $child_active = ($current_page == 'category.php' && $current_slug == $child_cat['slug']) ? 'active' : '';
+                        echo '<li><a href="category.php?slug=' . htmlspecialchars($child_cat['slug']) . '" class="' . $child_active . '">' . htmlspecialchars($child_cat['name']) . '</a></li>';
                     }
                     echo '</ul>';
                     echo '</li>';
