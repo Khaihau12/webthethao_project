@@ -21,6 +21,18 @@ CREATE TABLE `categories` (
   FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `username` varchar(100) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `role` enum('admin','editor','user') NOT NULL DEFAULT 'user',
+  `display_name` varchar(150) DEFAULT NULL,
+  `email` varchar(200) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `uniq_users_username` (`username`),
+  UNIQUE KEY `uniq_users_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 --
 -- Bảng Bài viết (Articles)
 --
@@ -32,24 +44,11 @@ CREATE TABLE `articles` (
   `summary` text,
   `content` text,
   `image_url` varchar(255) DEFAULT NULL,
+  `author_id` int(11) DEFAULT NULL,
   `is_featured` tinyint(1) DEFAULT 0,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Bảng Người dùng (Users) cho quản trị
---
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `username` varchar(100) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `role` enum('admin','editor','user') NOT NULL DEFAULT 'user',
-  `display_name` varchar(150) DEFAULT NULL,
-  `email` varchar(200) DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY `uniq_users_username` (`username`),
-  UNIQUE KEY `uniq_users_email` (`email`)
+  FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Lượt thích bài viết
