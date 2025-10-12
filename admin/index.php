@@ -15,7 +15,7 @@ $user = $auth->currentUser();
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trang quản trị</title>
-  <link rel="stylesheet" href="/webthethao_project/css/style.css" />
+  <link rel="stylesheet" href="<?php echo BASE_URL; ?>/css/style.css" />
   <style>
     .admin-wrap { max-width: 1100px; margin: 20px auto; }
     .admin-header { display:flex; justify-content: space-between; align-items:center; margin-bottom: 16px; }
@@ -31,21 +31,26 @@ $user = $auth->currentUser();
     <div class="admin-header">
       <h1>Bảng điều khiển</h1>
       <div>
-        Xin chào, <strong><?php echo htmlspecialchars($user->username); ?></strong> |
-        <a class="btn-logout" href="/webthethao_project/admin/logout.php">Đăng xuất</a>
+  Xin chào, <strong><?php echo htmlspecialchars($user->username); ?></strong> |
+  <a class="btn-logout" href="<?php echo BASE_URL; ?>/admin/logout.php">Đăng xuất</a>
       </div>
     </div>
     <div class="card-grid">
       <div class="card">
         <h3>Quản lý Bài viết</h3>
         <p>Thêm mới, chỉnh sửa, xóa bài viết.</p>
-        <a href="/webthethao_project/admin/articles.php">Tới danh sách bài viết →</a>
+  <a href="<?php echo BASE_URL; ?>/admin/articles.php">Tới danh sách bài viết →</a>
       </div>
-      <?php if (($user->role ?? '') === 'admin'): ?>
       <div class="card">
         <h3>Quản lý Chuyên mục</h3>
         <p>Thêm mới, chỉnh sửa, xóa chuyên mục.</p>
-        <a href="/webthethao_project/admin/categories.php">Tới danh sách chuyên mục →</a>
+        <a href="<?php echo BASE_URL; ?>/admin/categories.php">Tới danh sách chuyên mục →</a>
+      </div>
+      <?php if (($user->role ?? '') === 'admin'): ?>
+      <div class="card">
+        <h3>Quản lý Editor</h3>
+        <p>Tạo tài khoản editor để soạn thảo và quản lý nội dung.</p>
+        <a href="<?php echo BASE_URL; ?>/admin/editors.php">Tới danh sách editor →</a>
       </div>
       <?php endif; ?>
     </div>
