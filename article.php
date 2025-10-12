@@ -99,6 +99,10 @@ $comments = $article ? $interRepo->getComments((int)$article->id, 50, 0) : [];
                                 Chuyên mục: <span class="date-time"><?php echo $category_name; ?></span>
                                 &nbsp;•&nbsp;
                                 <span class="date-time"><?php echo $article_date; ?> <?php echo $article_time; ?></span>
+                                <?php if (!empty($article->author_name)): ?>
+                                    &nbsp;•&nbsp;
+                                    Tác giả: <span class="date-time"><?php echo htmlspecialchars($article->author_name); ?></span>
+                                <?php endif; ?>
                             </span>
                         </div>
                     </div>
