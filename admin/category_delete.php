@@ -8,7 +8,7 @@ require_once __DIR__ . '/../classes/Helpers.php';
 $db = Database::getInstance();
 $conn = $db->getConnection();
 $auth = new Auth($conn);
-$auth->requireAdmin();
+$auth->requireAdminOrEditor();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!Helpers::verifyCsrf($_POST['csrf'] ?? '')) {
