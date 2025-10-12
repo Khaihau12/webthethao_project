@@ -64,7 +64,8 @@ $articles = $articleRepo->listAll($limit, $offset, $search);
         <th>ID</th>
         <th>Tiêu đề</th>
         <th>Chuyên mục</th>
-        <th>Nổi bật</th>
+  <th>Tác giả</th>
+  <th>Nổi bật</th>
         <th>Ngày tạo</th>
         <th>Hành động</th>
       </tr>
@@ -74,7 +75,8 @@ $articles = $articleRepo->listAll($limit, $offset, $search);
       <tr>
         <td><?php echo (int)$a->id; ?></td>
         <td><a href="/webthethao_project/article.php?slug=<?php echo htmlspecialchars($a->slug); ?>" target="_blank"><?php echo htmlspecialchars($a->title); ?></a></td>
-        <td><?php echo htmlspecialchars($a->category_name); ?></td>
+  <td><?php echo htmlspecialchars($a->category_name); ?></td>
+  <td><?php echo htmlspecialchars($a->author_name ?? ''); ?></td>
         <td><?php echo $a->is_featured ? '✔' : '✖'; ?></td>
         <td><?php echo htmlspecialchars($a->created_at); ?></td>
         <td>
