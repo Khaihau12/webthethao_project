@@ -10,6 +10,9 @@ class Article {
     public $image_url;
     public $is_featured;
     public $created_at;
+    public $author_id;
+    public $author_name; // display_name if available, fallback to username
+    public $author_username;
     
     // Các thuộc tính được join từ bảng categories
     public $category_name;
