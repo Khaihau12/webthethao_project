@@ -54,19 +54,19 @@ class Auth {
 
     public function requireAdmin() {
         if (!$this->isLoggedIn() || ($_SESSION['user_role'] ?? '') !== 'admin') {
-            header('Location: /webthethao_project/admin/login.php');
+            header('Location: ' . BASE_URL . '/admin/login.php');
             exit;
         }
     }
 
     public function requireAdminOrEditor() {
         if (!$this->isLoggedIn()) {
-            header('Location: /webthethao_project/admin/login.php');
+            header('Location: ' . BASE_URL . '/admin/login.php');
             exit;
         }
         $role = $_SESSION['user_role'] ?? '';
         if ($role !== 'admin' && $role !== 'editor') {
-            header('Location: /webthethao_project/admin/login.php');
+            header('Location: ' . BASE_URL . '/admin/login.php');
             exit;
         }
     }
