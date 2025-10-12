@@ -211,8 +211,18 @@ a {
     color: #fff;
     font-weight: bold;
     font-size: 13px;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
     white-space: nowrap;
+}
+
+.main-nav li a:hover {
+    color: #78B43D; /* Màu xanh lá khi hover */
+    background-color: rgba(120, 180, 61, 0.1); /* Nền xanh nhạt */
+}
+
+.main-nav li a.active {
+    color: #78B43D; /* Màu xanh lá cho trang đang active */
+    background-color: rgba(120, 180, 61, 0.15);
 }
 
 /* Dropdown submenu styling to prevent items from wrapping or dropping */
@@ -231,8 +241,17 @@ a {
     z-index: 2000;
 }
 .main-nav .sub-menu li { display: block; margin: 0; }
-.main-nav .sub-menu li a { display: block; padding: 8px 12px; color: #fff; }
-.main-nav .sub-menu li a:hover { background: #444; }
+.main-nav .sub-menu li a { 
+    display: block; 
+    padding: 8px 12px; 
+    color: #fff; 
+    transition: all 0.3s ease;
+}
+.main-nav .sub-menu li a:hover { 
+    background: #444; 
+    color: #78B43D; /* Màu xanh lá khi hover submenu */
+    padding-left: 16px; /* Hiệu ứng dịch sang phải nhẹ */
+}
 .main-nav .has-children:hover .sub-menu,
 .main-nav .has-children:focus-within .sub-menu { display: block; }
 
