@@ -1,6 +1,15 @@
 <?php
 // Tên file: classes/MediaManager.php
+/**
+ * MediaManager
+ * - Tiện ích quản lý media: phát hiện file trong HTML, kiểm tra URL upload,
+ *   xóa file không còn được tham chiếu, và render UI chọn ảnh (upload/preview/delete).
+ */
 class MediaManager {
+    /**
+     * Trả về đường dẫn thư mục uploads tuyệt đối, đảm bảo tồn tại.
+     * @return string
+     */
     private static function uploadsDir() {
         $dir = realpath(__DIR__ . '/../assets/uploads');
         if ($dir === false) {
@@ -12,16 +21,31 @@ class MediaManager {
         return $dir;
     }
 
+    /**
+     * Kiểm tra URL có trỏ tới thư mục uploads của hệ thống hay không.
+     * @param string $url
+     * @return bool
+     */
     public static function isUploadUrl($url) {
         $path = parse_url($url, PHP_URL_PATH) ?? '';
         return strpos($path, '/assets/uploads/') !== false;
     }
 
+    /**
+     * Trích ra tên file từ URL.
+     * @param string $url
+     * @return string basename
+     */
     public static function filenameFromUrl($url) {
         $path = parse_url($url, PHP_URL_PATH) ?? '';
         return basename($path);
     }
 
+    /**
+     * Tìm tất cả các tên file (trong uploads) xuất hiện trong thẻ <img> và <source> của HTML.
+     * @param string $html
+     * @return string[] Danh sách tên file (duy nhất).
+     */
     public static function extractUploadFilenamesFromHtml($html) {
         $files = [];
         if (!is_string($html) || $html === '') return $files;
@@ -45,6 +69,13 @@ class MediaManager {
         return $files;
     }
 
+    /**
+     * Xóa file trong uploads nếu không còn được tham chiếu ở bài viết khác.
+     * @param mysqli $conn
+     * @param string $filename Tên file (định dạng hex16 + đuôi ảnh)
+     * @param int $skipArticleId Bỏ qua kiểm tra bài viết có id này (trường hợp đang xóa/chỉnh sửa chính bài đó)
+     * @return bool true nếu xóa thành công.
+     */
     public static function deleteIfUnreferenced(mysqli $conn, $filename, $skipArticleId = 0) {
         // Only allow our generated filenames (hex16 + extension) to be deleted
         if (!preg_match('/^[a-f0-9]{16}\.(?:jpg|jpeg|png|gif)$/i', $filename)) {
@@ -52,7 +83,7 @@ class MediaManager {
         }
         // Check other article references
         $like = '%' . $filename . '%';
-        $sql = "SELECT COUNT(*) AS cnt FROM articles WHERE id <> ? AND (content LIKE ? OR image_url LIKE ?)";
+    $sql = "SELECT COUNT(*) AS cnt FROM articles WHERE article_id <> ? AND (content LIKE ? OR image_url LIKE ?)";
         $stmt = $conn->prepare($sql);
         if (!$stmt) return false;
         $stmt->bind_param('iss', $skipArticleId, $like, $like);
@@ -72,7 +103,13 @@ class MediaManager {
     }
 
         // Render a small upload/picker UI and bind it to a text input selector
-        public static function renderQuickImagePicker($inputSelector, $csrfToken) {
+    /**
+     * Render UI chọn ảnh nhanh (nút Upload + preview), bind vào một input selector.
+     * @param string $inputSelector CSS selector của input sẽ nhận URL ảnh sau khi upload.
+     * @param string $csrfToken CSRF token để POST upload.
+     * @return string HTML + JS inline.
+     */
+    public static function renderQuickImagePicker($inputSelector, $csrfToken) {
                 $selectorJs = json_encode($inputSelector);
                 $csrfJs = json_encode($csrfToken);
             $base = defined('BASE_URL') ? BASE_URL : '';
@@ -119,6 +156,12 @@ HTML;
                 // Render a minimal image selector bound to a hidden input: only shows
                 // - when empty: an Upload button
                 // - when set: the image preview and a Delete button
+                /**
+                 * Render UI bộ chọn ảnh tối giản: khi có URL thì hiển thị preview + nút Xóa; khi trống hiển thị nút Upload.
+                 * @param string $inputSelector CSS selector của input hidden/visible chứa URL ảnh.
+                 * @param string $csrfToken
+                 * @return string HTML + JS inline.
+                 */
                 public static function renderImageSelector($inputSelector, $csrfToken) {
                         $selectorJs = json_encode($inputSelector);
                         $csrfJs = json_encode($csrfToken);
