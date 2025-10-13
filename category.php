@@ -1,5 +1,14 @@
+
 <?php
-// Tên file: category.php
+// =============================
+// Câu 4: Hiển thị danh sách chuyên mục và bài viết
+// =============================
+// Trang này nhận slug chuyên mục từ URL, lấy danh sách bài viết thuộc chuyên mục đó và hiển thị ra giao diện.
+// Các bước xử lý gồm:
+//   1. Nhận slug chuyên mục từ URL (?slug=...)
+//   2. Kiểm tra slug hợp lệ
+//   3. Lấy danh sách bài viết thuộc chuyên mục bằng ArticleRepository->getArticlesByCategorySlug
+//   4. Hiển thị tên chuyên mục và danh sách bài viết ra giao diện
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/Article.php';
