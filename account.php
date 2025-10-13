@@ -1,4 +1,15 @@
+
 <?php
+// =============================
+// Câu 3: Cập nhật thông tin tài khoản (đổi mật khẩu)
+// =============================
+// Trang này cho phép người dùng đổi mật khẩu và xem các bài đã lưu/xem.
+// Các bước xử lý đổi mật khẩu gồm:
+//   1. Nhận dữ liệu từ form POST (old_password, new_password, csrf token)
+//   2. Kiểm tra hợp lệ CSRF token để chống tấn công giả mạo
+//   3. Kiểm tra mật khẩu cũ đúng không bằng password_verify
+//   4. Nếu đúng, cập nhật password_hash mới vào DB
+//   5. Hiển thị thông báo thành công hoặc lỗi
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/Article.php';
@@ -27,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
         $fresh = $userRepo->findById($user->id);
         if ($fresh && password_verify($old, $fresh->password_hash)) {
             $hash = password_hash($new, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
             $stmt->bind_param('si', $hash, $user->id);
             if ($stmt->execute()) $msg = 'Đổi mật khẩu thành công.'; else $err = 'Lỗi khi đổi mật khẩu.';
             $stmt->close();
