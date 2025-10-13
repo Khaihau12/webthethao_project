@@ -1,4 +1,8 @@
 <?php
+// Câu 2: Đăng nhập
+// - Mục tiêu: nhận username/password từ form, kiểm tra CSRF, xác thực bằng Auth->login(),
+//   sau đó chuyển hướng về trang tài khoản nếu thành công, hoặc hiển thị lỗi nếu thất bại.
+// - Bảo mật: sử dụng CSRF token để chống tấn công giả mạo yêu cầu; dùng password_hash/password_verify.
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/Auth.php';
@@ -10,15 +14,20 @@ $auth = new Auth($conn);
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!Helpers::verifyCsrf($_POST['csrf'] ?? '')) { $error = 'CSRF không hợp lệ.'; }
-    $username = trim($_POST['username'] ?? '');
-    $password = trim($_POST['password'] ?? '');
-    if ($error === '') {
-        if ($auth->login($username, $password)) {
-            header('Location: /webthethao_project/account.php');
-            exit;
-        } else { $error = 'Sai tài khoản hoặc mật khẩu.'; }
-    }
+  // 1) Kiểm tra CSRF: từ thẻ input hidden name="csrf"
+  if (!Helpers::verifyCsrf($_POST['csrf'] ?? '')) { $error = 'CSRF không hợp lệ.'; }
+  // 2) Lấy input và làm sạch tối thiểu (trim)
+  $username = trim($_POST['username'] ?? '');
+  $password = trim($_POST['password'] ?? '');
+  // 3) Nếu hợp lệ, gọi Auth->login() để xác thực
+  if ($error === '') {
+    // Auth->login() sẽ: tìm user theo username, password_verify, lưu user_id & user_role vào session
+    if ($auth->login($username, $password)) {
+      // 4) Thành công: chuyển hướng về trang tài khoản của tôi
+      header('Location: /webthethao_project/account.php');
+      exit;
+    } else { $error = 'Sai tài khoản hoặc mật khẩu.'; }
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -36,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Đăng nhập</h1>
     <?php if ($error): ?><div class="alert"><?php echo htmlspecialchars($error); ?></div><?php endif; ?>
     <form method="post">
+      <!-- CSRF token: bắt buộc cho POST để chống tấn công CSRF -->
       <input type="hidden" name="csrf" value="<?php echo Helpers::csrfToken(); ?>" />
       <label>Username</label>
       <input type="text" name="username" required />
