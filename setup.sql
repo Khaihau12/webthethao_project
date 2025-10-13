@@ -14,15 +14,15 @@ USE `webthethao`;
 -- Bảng Chuyên mục (Categories)
 --
 CREATE TABLE `categories` (
-  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `category_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `name` varchar(100) NOT NULL,
   `slug` varchar(120) UNIQUE NOT NULL,
   `parent_id` int(11) DEFAULT NULL,
-  FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
+  FOREIGN KEY (`parent_id`) REFERENCES `categories` (`category_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `user_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `username` varchar(100) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
   `role` enum('admin','editor','user') NOT NULL DEFAULT 'user',
@@ -37,7 +37,7 @@ CREATE TABLE `users` (
 -- Bảng Bài viết (Articles)
 --
 CREATE TABLE `articles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `article_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `category_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `slug` varchar(255) UNIQUE NOT NULL,
@@ -47,8 +47,8 @@ CREATE TABLE `articles` (
   `author_id` int(11) DEFAULT NULL,
   `is_featured` tinyint(1) DEFAULT 0,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+  FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`author_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Lượt thích bài viết
@@ -57,8 +57,8 @@ CREATE TABLE `article_likes` (
   `article_id` int(11) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`, `article_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`article_id`) REFERENCES `articles` (`article_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Lưu bài viết (bookmark)
@@ -67,8 +67,8 @@ CREATE TABLE `article_saves` (
   `article_id` int(11) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`, `article_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`article_id`) REFERENCES `articles` (`article_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Bài viết đã xem (lưu lần xem cuối)
@@ -77,19 +77,19 @@ CREATE TABLE `article_views` (
   `article_id` int(11) NOT NULL,
   `viewed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`, `article_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`article_id`) REFERENCES `articles` (`article_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Bình luận bài viết
 CREATE TABLE `comments` (
-  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `comment_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `article_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `content` text NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`article_id`) REFERENCES `articles` (`article_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   INDEX (`article_id`),
   INDEX (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -100,7 +100,7 @@ CREATE TABLE `comments` (
 -- Dữ liệu mẫu
 --
 
-INSERT INTO `categories` (`id`, `name`, `slug`, `parent_id`) VALUES
+INSERT INTO `categories` (`category_id`, `name`, `slug`, `parent_id`) VALUES
 (1, 'Thể thao', 'the-thao', NULL),
 (2, 'Kinh doanh', 'kinh-doanh', NULL),
 (3, 'Thế giới', 'the-gioi', NULL),
@@ -116,7 +116,7 @@ INSERT INTO `categories` (`id`, `name`, `slug`, `parent_id`) VALUES
 (13, 'Công nghệ', 'cong-nghe', NULL),
 (14, 'Du lịch', 'du-lich', NULL);
 
-INSERT INTO `articles` (`id`, `category_id`, `title`, `slug`, `summary`, `content`, `image_url`, `is_featured`, `created_at`) VALUES
+INSERT INTO `articles` (`article_id`, `category_id`, `title`, `slug`, `summary`, `content`, `image_url`, `is_featured`, `created_at`) VALUES
 (1, 5, 'Mbappe chính thức gia nhập Real Madrid với hợp đồng 5 năm', 'mbappe-gia-nhap-real-madrid', 'Sau nhiều năm chờ đợi, cuối cùng siêu sao người Pháp Kylian Mbappe đã trở thành người của Real Madrid.', '<p>Đây là một bản hợp đồng thế kỷ, hứa hẹn sẽ thay đổi cán cân quyền lực của bóng đá châu Âu trong nhiều năm tới.</p><p><img src=\"/webthethao_project/assets/uploads/378ec01e536cdcb8.png\"></p><p class=\"ql-align-center\">Hình ảnh vũ hát cực chill</p><p>Hey&nbsp;<strong>Quách Khải Hậu</strong>,</p><p>Welcome!</p><p>Thank you for joining&nbsp;<a href=\"https://education.github.com/globalcampus/student?email_referrer=true\" rel=\"noopener noreferrer\" target=\"_blank\" style=\"color: rgb(65, 131, 196);\">GitHub Education</a>. GitHub Education helps students, teachers, and schools access the tools and resources they need to shape the next generation of software development.</p><p>Congratulations, you are now a GitHub Education student! You can now explore valuable offers provided by GitHub\'s partners in the GitHub Student Developer Pack, view student events, and much more when you sign in at:</p><p><a href=\"https://education.github.com/globalcampus/student?email_referrer=true\" rel=\"noopener noreferrer\" target=\"_blank\" style=\"color: rgb(65, 131, 196);\">https://education.github.com/globalcampus/student?email_referrer=true</a></p><p>If you are renewing your membership please be aware that some of our partner offers are single-use and non-renewable, and that you should contact the partner directly if you have any questions.</p><p>Learn about GitHub Education\'s programs for students, like GitHub Campus Experts and our grants for first-time hackathons:</p><p><a href=\"https://education.github.com/students\" rel=\"noopener noreferrer\" target=\"_blank\" style=\"color: rgb(65, 131, 196);\">https://education.github.com/students</a></p><p>Introduce yourself to the GitHub Education Community:</p><p><a href=\"https://github.com/orgs/github-community/discussions/categories/github-education\" rel=\"noopener noreferrer\" target=\"_blank\" style=\"color: rgb(65, 131, 196);\">https://github.com/orgs/github-community/discussions/categories/github-education</a></p><p>Your teacher or faculty advisor can request private repositories for your class projects or student club. Send them to:</p><p><a href=\"https://help.github.com/categories/teaching-and-learning-with-github-education\" rel=\"noopener noreferrer\" target=\"_blank\" style=\"color: rgb(65, 131, 196);\">https://help.github.com/categories/teaching-and-learning-with-github-education</a></p><p>Give the gift of GitHub Education to your entire school:</p><p><a href=\"https://education.github.com/partners/schools\" rel=\"noopener noreferrer\" target=\"_blank\" style=\"color: rgb(65, 131, 196);\">https://education.github.com/partners/schools</a></p><p>Have an Octotastic day!</p><p class=\"ql-align-justify\">- The GitHub Education Team</p>', '/webthethao_project/assets/uploads/aca32bba04d677f9.png', 0, '2025-10-11 17:57:49'),
 (2, 5, 'Kết quả V-League: HAGL chia điểm kịch tính với Hà Nội FC', 'ket-qua-vleague-hagl-hanoi', 'Trận cầu tâm điểm vòng 15 V-League đã diễn ra vô cùng hấp dẫn với màn rượt đuổi tỷ số ngoạn mục.', '<p>Chi tiết trận đấu... jbajDBJLSBJDA  SADSADADASDSAD </p>', '/webthethao_project/assets/uploads/b784a0a6deed5daa.png', 0, '2025-10-11 17:57:49'),
 (3, 6, 'Carlos Alcaraz giành chức vô địch Wimbledon sau trận chung kết nghẹt thở', 'alcaraz-vo-dich-wimbledon', 'Tay vợt trẻ người Tây Ban Nha đã xuất sắc đánh bại đối thủ kỳ cựu để lần đầu tiên lên ngôi tại Wimbledon.', '<p><br></p><p>jnnkknkj</p>', '/webthethao_project/assets/uploads/63306f005d22c03d.png', 0, '2025-10-11 17:57:49'),
