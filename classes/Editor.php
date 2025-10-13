@@ -1,7 +1,20 @@
 <?php
 // Tên file: classes/Editor.php
+/**
+ * Editor
+ * - Kết hợp TinyMCE (nếu có API key) với fallback Quill để soạn thảo WYSIWYG.
+ * - Tích hợp upload ảnh an toàn thông qua endpoint nội bộ.
+ */
 class Editor {
-    public static function renderTinyMCE($selector, $csrfToken) {
+  /**
+   * Render script khởi tạo trình soạn thảo cho một textarea/input selector.
+   * - Nếu có TINYMCE_API_KEY: dùng TinyMCE với images_upload_handler post lên server.
+   * - Nếu không: dùng Quill, override nút image để upload rồi chèn URL.
+   * @param string $selector CSS selector của textarea cần gắn editor.
+   * @param string $csrfToken CSRF token để gọi upload endpoint.
+   * @return string HTML/JS để nhúng vào trang.
+   */
+  public static function renderTinyMCE($selector, $csrfToken) {
         $selectorJs = json_encode($selector);
         $csrfJs = json_encode($csrfToken);
     $base = defined('BASE_URL') ? BASE_URL : '';
