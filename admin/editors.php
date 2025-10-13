@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // list editors
-$res = $conn->query("SELECT id, username, display_name, email, role, created_at FROM users WHERE role = 'editor' ORDER BY created_at DESC");
+$res = $conn->query("SELECT user_id AS id, username, display_name, email, role, created_at FROM users WHERE role = 'editor' ORDER BY created_at DESC");
 $editors = $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
 ?>
 <!DOCTYPE html>
