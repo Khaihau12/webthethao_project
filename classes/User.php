@@ -15,6 +15,10 @@ class User {
                 $this->$key = $value;
             }
         }
+        // compatibility: if user_id present but id not set, map it
+        if (!isset($this->id) && isset($data['user_id'])) {
+            $this->id = $data['user_id'];
+        }
     }
 }
 ?>
