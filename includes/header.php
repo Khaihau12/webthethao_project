@@ -12,11 +12,11 @@ if (!isset($conn) || !$conn->ping()) {
 }
 // Khởi tạo Auth để biết tình trạng đăng nhập
 $auth = new Auth($conn);
-$current_user = $auth->currentUser();
+$current_user = $auth->currentUser(); // Câu 2: xác định trạng thái đăng nhập để hiển thị link Tài khoản/Đăng nhập/Đăng ký
 
 // Lấy categories cho menu chính
 $categoryRepo = new CategoryRepository($conn);
-$all_categories = $categoryRepo->getAllCategories();
+$all_categories = $categoryRepo->getAllCategories(); // Câu 4: dùng để dựng menu chuyên mục từ CSDL
 
 // Xây dựng cây menu chuyên mục
 $category_map = [];
@@ -61,7 +61,7 @@ foreach ($all_categories as $cat) {
         <ul>
             <li><a href="index.php" class="active"><i class="fa fa-home"></i> TRANG CHỦ</a></li>
             <?php
-            // Hiển thị menu cấp 1
+            // Hiển thị menu cấp 1 (Câu 4: mỗi mục sẽ dẫn tới category.php?slug=...)
             foreach ($category_map[0] ?? [] as $top_cat) {
                 $children = $category_map[$top_cat['id']] ?? [];
                 
