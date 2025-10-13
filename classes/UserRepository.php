@@ -56,6 +56,7 @@ class UserRepository {
      * @return User|null Trả về đối tượng User nếu tìm thấy, ngược lại null.
      */
     public function findByUsername($username) {
+        // Câu 2: dùng để đăng nhập (tìm bản ghi theo username)
         $sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) return null;
@@ -73,7 +74,8 @@ class UserRepository {
      * @return User|null Trả về User nếu có, ngược lại null.
      */
     public function findById($id) {
-    $sql = "SELECT user_id AS id, username, password_hash, role, display_name, email, created_at FROM users WHERE user_id = ? LIMIT 1";
+        // Lấy thông tin user theo ID; alias user_id AS id để tương thích entity
+        $sql = "SELECT user_id AS id, username, password_hash, role, display_name, email, created_at FROM users WHERE user_id = ? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) return null;
         $stmt->bind_param("i", $id);
@@ -90,6 +92,7 @@ class UserRepository {
      * @return User|null Trả về User nếu có, ngược lại null.
      */
     public function findByEmail($email) {
+        // Câu 2 (Đăng ký): kiểm tra trùng email trước khi tạo tài khoản
         if ($email === null || $email === '') return null;
         $sql = "SELECT * FROM users WHERE email = ? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
@@ -112,6 +115,7 @@ class UserRepository {
      * @return bool true nếu tạo thành công, false nếu thất bại.
      */
     public function create($username, $password, $role = 'user', $display_name = null, $email = null) {
+        // Câu 2 (Đăng ký): tạo tài khoản mới, mật khẩu được băm bằng password_hash
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         $sql = "INSERT INTO users (username, password_hash, role, display_name, email) VALUES (?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
