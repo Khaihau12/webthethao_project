@@ -30,20 +30,25 @@ $articleRepo = new ArticleRepository($conn);
 
 $msg = '';$err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
-    if (!Helpers::verifyCsrf($_POST['csrf'] ?? '')) { $err = 'CSRF không hợp lệ.'; }
-    $old = trim($_POST['old_password'] ?? '');
-    $new = trim($_POST['new_password'] ?? '');
-    if ($err === '') {
-        // Reload user from DB
-        $fresh = $userRepo->findById($user->id);
-        if ($fresh && password_verify($old, $fresh->password_hash)) {
-            $hash = password_hash($new, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
-            $stmt->bind_param('si', $hash, $user->id);
-            if ($stmt->execute()) $msg = 'Đổi mật khẩu thành công.'; else $err = 'Lỗi khi đổi mật khẩu.';
-            $stmt->close();
-        } else { $err = 'Mật khẩu cũ không đúng.'; }
-    }
+  // Câu 3: Đổi mật khẩu
+  // 1) Kiểm tra CSRF token hợp lệ
+  if (!Helpers::verifyCsrf($_POST['csrf'] ?? '')) { $err = 'CSRF không hợp lệ.'; }
+  // 2) Lấy mật khẩu cũ/mới
+  $old = trim($_POST['old_password'] ?? '');
+  $new = trim($_POST['new_password'] ?? '');
+  // 3) Nếu hợp lệ, kiểm tra mật khẩu cũ bằng password_verify
+  if ($err === '') {
+    // Reload user từ DB để có password_hash mới nhất
+    $fresh = $userRepo->findById($user->id);
+    if ($fresh && password_verify($old, $fresh->password_hash)) {
+      // 4) Băm mật khẩu mới và cập nhật vào DB
+      $hash = password_hash($new, PASSWORD_DEFAULT);
+      $stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
+      $stmt->bind_param('si', $hash, $user->id);
+      if ($stmt->execute()) $msg = 'Đổi mật khẩu thành công.'; else $err = 'Lỗi khi đổi mật khẩu.';
+      $stmt->close();
+    } else { $err = 'Mật khẩu cũ không đúng.'; }
+  }
 }
 
 $saved = $inter->listSaved($user->id, 5, 0);
