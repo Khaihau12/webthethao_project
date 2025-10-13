@@ -41,7 +41,7 @@ if (!$user || $user->role !== 'editor') {
 }
 
 // Optional: reassign or nullify author_id for their articles. We'll just keep articles with author_id to preserve history.
-$stmt = $conn->prepare("DELETE FROM users WHERE id = ? AND role = 'editor'");
+$stmt = $conn->prepare("DELETE FROM users WHERE user_id = ? AND role = 'editor'");
 $stmt->bind_param('i', $id);
 $stmt->execute();
 
