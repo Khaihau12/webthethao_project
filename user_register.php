@@ -1,4 +1,16 @@
+
 <?php
+// =============================
+// Câu 2: Đăng ký tài khoản
+// =============================
+// Chức năng này cho phép người dùng tạo tài khoản mới.
+// Các bước xử lý gồm:
+//   1. Nhận dữ liệu từ form POST (username, password, display_name, email, csrf token)
+//   2. Kiểm tra hợp lệ CSRF token để chống tấn công giả mạo
+//   3. Kiểm tra trùng username/email trước khi tạo
+//   4. Nếu hợp lệ, gọi UserRepository->create để lưu vào DB (password sẽ được băm)
+//   5. Nếu thành công, hiển thị thông báo đăng ký thành công
+//   6. Nếu lỗi, hiển thị thông báo lỗi
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/User.php';
