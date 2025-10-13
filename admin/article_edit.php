@@ -23,7 +23,9 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $editing = null;
 if ($id > 0) {
     // Lấy lại bài viết theo id
-    $stmt = $conn->prepare("SELECT a.*, c.name as category_name, c.slug as category_slug FROM articles a JOIN categories c ON a.category_id = c.id WHERE a.id = ? LIMIT 1");
+  $stmt = $conn->prepare("SELECT a.article_id AS id, a.category_id, a.title, a.slug, a.summary, a.content, a.image_url, a.is_featured, a.created_at,
+                   c.name as category_name, c.slug as category_slug
+              FROM articles a JOIN categories c ON a.category_id = c.category_id WHERE a.article_id = ? LIMIT 1");
     $stmt->bind_param('i', $id);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
