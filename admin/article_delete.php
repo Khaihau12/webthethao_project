@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int)($_POST['id'] ?? 0);
     if ($id > 0) {
         // Fetch article to know which images it referenced
-        $stmt = $conn->prepare("SELECT content, image_url FROM articles WHERE id = ? LIMIT 1");
+    $stmt = $conn->prepare("SELECT content, image_url FROM articles WHERE article_id = ? LIMIT 1");
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $art = $stmt->get_result()->fetch_assoc();
