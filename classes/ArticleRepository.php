@@ -76,6 +76,12 @@ class ArticleRepository {
      * @return Article[]
      */
     public function getArticlesByCategorySlug($slug, $limit = 10) {
+        // Câu 4: Hiển thị bài theo chuyên mục
+        // 1) Tìm category_id của chuyên mục theo slug
+        // 2) Tìm các chuyên mục con trực tiếp (nếu có)
+        // 3) Lấy danh sách bài viết có category_id thuộc tập trên, sắp theo created_at DESC
+        // 4) Giới hạn số lượng theo $limit
+        // Lưu ý: dùng placeholder IN (?,?,?) và bind types động để an toàn
         // 1. Tìm ID của chuyên mục cha và tất cả chuyên mục con của nó
     $stmt = $this->conn->prepare("SELECT category_id AS id FROM categories WHERE slug = ?");
         $stmt->bind_param("s", $slug);
@@ -94,12 +100,12 @@ class ArticleRepository {
         }
         $stmt->close();
         
-        // 2. Tạo chuỗi placeholder (?, ?, ?) cho câu lệnh IN
+    // 2. Tạo chuỗi placeholder (?, ?, ?) cho câu lệnh IN
         $placeholders = implode(',', array_fill(0, count($category_ids), '?'));
         $types = str_repeat('i', count($category_ids)) . 'i';
         $params = array_merge($category_ids, [$limit]);
 
-        // 3. Truy vấn các bài viết có category_id nằm trong danh sách ID đã tìm được
+    // 3. Truy vấn các bài viết có category_id nằm trong danh sách ID đã tìm được
     $sql = "SELECT a.article_id AS id, a.category_id, a.title, a.slug, a.summary, a.content, a.image_url, a.is_featured, a.created_at,
                c.name as category_name, c.slug as category_slug
         FROM articles a JOIN categories c ON a.category_id = c.category_id
