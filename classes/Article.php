@@ -24,6 +24,10 @@ class Article {
                 $this->$key = $value;
             }
         }
+        // compatibility: if article_id present but id not set, map it
+        if (!isset($this->id) && isset($data['article_id'])) {
+            $this->id = $data['article_id'];
+        }
     }
 }
 ?>
