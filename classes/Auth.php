@@ -34,6 +34,10 @@ class Auth {
      * @return bool true nếu thành công; false nếu sai thông tin.
      */
     public function login($username, $password) {
+        // Câu 2 (Đăng nhập):
+        // - Tìm user theo username
+        // - Dùng password_verify để so sánh mật khẩu
+        // - Nếu đúng, lưu user_id & user_role vào session để các trang khác nhận biết đã đăng nhập
         $user = $this->userRepo->findByUsername($username);
         if (!$user) { return false; }
         if (password_verify($password, $user->password_hash)) {
@@ -65,6 +69,7 @@ class Auth {
      * @return User|null
      */
     public function currentUser() {
+        // Trả về đối tượng User từ session hiện tại (nếu có)
         if (!empty($_SESSION['user_id'])) {
             return $this->userRepo->findById((int)$_SESSION['user_id']);
         }
@@ -84,6 +89,7 @@ class Auth {
      * @return void
      */
     public function requireAdmin() {
+        // Guard trang admin: nếu chưa đăng nhập hoặc không phải admin => chuyển về trang login admin
         if (!$this->isLoggedIn() || ($_SESSION['user_role'] ?? '') !== 'admin') {
             header('Location: ' . BASE_URL . '/admin/login.php');
             exit;
@@ -95,6 +101,7 @@ class Auth {
      * @return void
      */
     public function requireAdminOrEditor() {
+        // Guard trang quản trị chung: cho phép admin hoặc editor
         if (!$this->isLoggedIn()) {
             header('Location: ' . BASE_URL . '/admin/login.php');
             exit;
