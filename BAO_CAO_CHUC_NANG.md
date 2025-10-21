@@ -1,21 +1,25 @@
 # BÁO CÁO THIẾT KẾ VÀ XÂY DỰNG CÁC CHỨC NĂNG
+**Đề tài:** Website Tin Thể Thao  
+**Công nghệ:** PHP, MySQL (XAMPP)
+
+---
 
 ## Câu 2: Thiết kế và xây dựng chức năng Đăng ký, Đăng nhập
 
-### 1. TỔNG QUAN CHỨC NĂNG
+### 1. TỔNG QUAN
 
 #### 1.1. Mục đích
-- Cho phép người dùng tạo tài khoản mới trên hệ thống
-- Xác thực người dùng và quản lý phiên đăng nhập
-- Bảo vệ các trang yêu cầu đăng nhập (tài khoản, lưu bài viết, bình luận...)
+- Cho phép người dùng tạo tài khoản mới
+- Đăng nhập vào hệ thống
+- Phân biệt người dùng đã đăng nhập và khách
 
 #### 1.2. Vị trí trong web
-- **Đăng ký**: `http://localhost/webthethao_project/user_register.php`
-- **Đăng nhập**: `http://localhost/webthethao_project/user_login.php`
-- **Đăng xuất**: `http://localhost/webthethao_project/user_logout.php`
-- **Liên kết**: Hiển thị trên thanh menu (header) - "Đăng ký", "Đăng nhập" khi chưa đăng nhập
+- **Đăng ký**: `user_register.php`
+- **Đăng nhập**: `user_login.php`  
+- **Đăng xuất**: `user_logout.php`
+- **Menu**: Hiển thị "Đăng ký", "Đăng nhập" khi chưa đăng nhập
 
-### 2. THIẾT KẾ HỆ THỐNG
+### 2. THIẾT KẾ
 
 #### 2.1. Cơ sở dữ liệu
 
@@ -31,73 +35,54 @@ CREATE TABLE users (
 );
 ```
 
-**Các trường quan trọng:**
-- `user_id`: Khóa chính, định danh duy nhất
-- `username`: Tên đăng nhập (duy nhất)
-- `email`: Email người dùng (duy nhất)
-- `password_hash`: Mật khẩu đã mã hóa bằng `password_hash()`
-- `role`: Vai trò (user thường, editor biên tập, admin quản trị)
-- `created_at`: Thời điểm tạo tài khoản
+**Giải thích:**
+- `user_id`: Mã số người dùng (tự động tăng)
+- `username`: Tên đăng nhập (không trùng)
+- `email`: Email (không trùng)
+- `password_hash`: Mật khẩu đã mã hóa
+- `role`: Vai trò (user/editor/admin)
 
-#### 2.2. Kiến trúc hệ thống
+#### 2.2. Cấu trúc file
 
-**Phân lớp (Layer Architecture):**
-
-1. **Presentation Layer (Giao diện)**
-   - `user_register.php`: Form đăng ký
-   - `user_login.php`: Form đăng nhập
-   - `user_logout.php`: Xử lý đăng xuất
-   - `includes/header.php`: Menu điều hướng theo trạng thái
-
-2. **Business Logic Layer (Xử lý nghiệp vụ)**
-   - `classes/Auth.php`: Quản lý xác thực và phiên
-   - `classes/UserRepository.php`: Thao tác dữ liệu người dùng
-
-3. **Data Access Layer (Truy cập dữ liệu)**
-   - `classes/Database.php`: Kết nối và quản lý database
-   - Prepared Statements: Bảo vệ chống SQL Injection
-
-#### 2.3. Sơ đồ luồng dữ liệu
-
-**Luồng Đăng ký:**
 ```
-User -> Form Đăng ký (user_register.php)
-  -> Kiểm tra CSRF Token
-  -> Validate dữ liệu (username, email, password)
-  -> UserRepository::findByUsername/findByEmail (kiểm tra trùng)
-  -> password_hash() (mã hóa mật khẩu)
-  -> UserRepository::create() (lưu vào DB)
-  -> Chuyển hướng đến trang đăng nhập
+user_register.php    → Trang đăng ký
+user_login.php       → Trang đăng nhập
+user_logout.php      → Xử lý đăng xuất
+classes/Auth.php     → Xử lý xác thực
+classes/UserRepository.php → Truy vấn user
 ```
 
-**Luồng Đăng nhập:**
+#### 2.3. Luồng hoạt động
+
+**Đăng ký:**
 ```
-User -> Form Đăng nhập (user_login.php)
-  -> Kiểm tra CSRF Token
-  -> UserRepository::findByUsername/findByEmail
-  -> password_verify() (xác thực mật khẩu)
-  -> Tạo session ($_SESSION['user_id'], $_SESSION['username']...)
-  -> session_regenerate_id() (bảo mật session)
-  -> Chuyển hướng đến trang chủ/tài khoản
+1. User điền form (username, email, password)
+2. Kiểm tra username/email đã tồn tại chưa
+3. Mã hóa mật khẩu
+4. Lưu vào database
+5. Chuyển sang trang đăng nhập
 ```
 
-### 3. XÂY DỰNG CHỨC NĂNG
+**Đăng nhập:**
+```
+1. User nhập username + password
+2. Tìm user trong database
+3. So sánh mật khẩu
+4. Lưu thông tin vào SESSION
+5. Chuyển về trang chủ
+```
 
-#### 3.1. Chức năng Đăng ký
+### 3. XÂY DỰNG
 
-**File: `user_register.php`**
+#### 3.1. Đăng ký (user_register.php)
 
-**Các bước xử lý:**
-
-1. **Hiển thị form đăng ký (GET request):**
-   - Tạo CSRF token và lưu vào session
-   - Hiển thị form với các trường: username, email, password, confirm_password
-
-2. **Xử lý đăng ký (POST request):**
+**Code chính:**
 
 ```php
-// Bước 1: Kiểm tra CSRF token
-if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+// Nhận dữ liệu từ form
+$username = $_POST['username'];
+$email = $_POST['email'];
+$password = $_POST['password'];
     $error = "Yêu cầu không hợp lệ";
 }
 
