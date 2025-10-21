@@ -1,29 +1,40 @@
-# WebTheThao - Website tin tức PHP (chạy local)
+# WebTheThao - Website tin tức PHP cơ bản
 
-Dự án là một website tin tức nhỏ viết bằng PHP + MySQL (chạy tốt trên XAMPP/WAMP hoặc bất kỳ môi trường PHP + MySQL cục bộ). Dữ liệu mẫu và helper đã được cấu hình để hiển thị bài viết động từ bảng `articles`.
+Dự án là một website tin tức đơn giản viết bằng PHP + MySQL (chạy trên XAMPP). Phù hợp cho người mới học lập trình web cơ bản.
 
-Hướng dẫn cài đặt nhanh
+## Hướng dẫn cài đặt
 
-1) Khởi động XAMPP và bật Apache + MySQL.
-2) Import cơ sở dữ liệu:
-   - Mở `phpMyAdmin` và chạy file `setup.sql` ở thư mục gốc dự án, hoặc chạy từ terminal PowerShell:
+1) **Khởi động XAMPP**: Bật Apache + MySQL
+2) **Import database**: 
+   - Mở `phpMyAdmin` (http://localhost/phpmyadmin)
+   - Chạy file `setup.sql` để tạo database `webthethao`
+3) **Mở website**: http://localhost/webthethao_project/
 
-```powershell
-mysql -u root -p < .\setup.sql
-```
+## Cấu hình
 
-3) Đặt dự án vào web root (đã ở sẵn: `c:\xampp\htdocs\webthethao_project`).
-4) Mở trình duyệt: http://localhost/webthethao_project/index.php
+- File cấu hình: `config.php`
+- Database: `webthethao`
+- User: `root` (không mật khẩu)
 
-Ghi chú
-- Ảnh mẫu nằm trong thư mục `assets/`. Bạn có thể thay thế bằng ảnh của bạn.
-- Cấu hình kết nối CSDL nằm ở `config.php` (tài khoản mặc định thường là `root`/trống). Hãy điều chỉnh theo máy của bạn.
+## Tính năng
 
-Tính năng có sẵn (tóm tắt)
-- Trang chủ, trang bài viết, trang chuyên mục.
-- Đăng ký/Đăng nhập người dùng, trang tài khoản (đổi mật khẩu).
-- Quản lý bài viết/chuyên mục (admin/editor) nếu đã bật module quản trị.
+- ✅ Trang chủ (danh sách bài viết mới nhất)
+- ✅ Chi tiết bài viết
+- ✅ Danh mục bài viết
+- ✅ Đăng ký tài khoản
+- ✅ Đăng nhập/Đăng xuất
+- ✅ Trang tài khoản (đổi mật khẩu, xem bài đã lưu)
+- ✅ Quản trị (admin/editor)
 
-Mẹo khi gặp lỗi thường gặp
-- Không vào được DB: kiểm tra MySQL đã chạy và thông số trong `config.php` đúng tên database đã import từ `setup.sql`.
-- Ảnh không hiển thị: kiểm tra đường dẫn `assets/` hoặc cập nhật `image_url` trong DB.
+## Lưu ý
+
+**Đây là phiên bản CƠ BẢN dành cho học tập:**
+- Code đơn giản, dễ hiểu
+- Không có các tính năng bảo mật phức tạp
+- Phù hợp với môn Lập trình Web cơ bản
+
+## Khắc phục lỗi
+
+- **Không kết nối được DB**: Kiểm tra MySQL đã chạy, file `config.php` đúng
+- **Ảnh không hiển thị**: Kiểm tra thư mục `assets/uploads/`
+- **Lỗi 404**: Đảm bảo thư mục nằm trong `C:\xampp\htdocs\`
