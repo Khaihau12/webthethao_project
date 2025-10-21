@@ -1,50 +1,53 @@
 
 <?php
-// =============================
-// Câu 2: Đăng ký tài khoản
-// =============================
-// Chức năng này cho phép người dùng tạo tài khoản mới.
-// Các bước xử lý gồm:
-//   1. Nhận dữ liệu từ form POST (username, password, display_name, email, csrf token)
-//   2. Kiểm tra hợp lệ CSRF token để chống tấn công giả mạo
-//   3. Kiểm tra trùng username/email trước khi tạo
-//   4. Nếu hợp lệ, gọi UserRepository->create để lưu vào DB (password sẽ được băm)
-//   5. Nếu thành công, hiển thị thông báo đăng ký thành công
-//   6. Nếu lỗi, hiển thị thông báo lỗi
+// Đăng ký tài khoản đơn giản
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/classes/Database.php';
 require_once __DIR__ . '/classes/User.php';
 require_once __DIR__ . '/classes/UserRepository.php';
-require_once __DIR__ . '/classes/Auth.php';
-require_once __DIR__ . '/classes/Helpers.php';
 
 $db = Database::getInstance();
 $conn = $db->getConnection();
-$auth = new Auth($conn);
 $userRepo = new UserRepository($conn);
 
 $errors = [];
 $success = false;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!Helpers::verifyCsrf($_POST['csrf'] ?? '')) { $errors[] = 'CSRF không hợp lệ.'; }
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
     $display_name = trim($_POST['display_name'] ?? '');
     $email = trim($_POST['email'] ?? '');
-    if ($username === '' || $password === '') $errors[] = 'Cần username và password';
-  // Kiểm tra trùng username rõ ràng trước khi tạo
-  if (!$errors) {
-    $existing = $userRepo->findByUsername($username);
-    if ($existing) { $errors[] = 'Username đã tồn tại. Vui lòng chọn tên khác.'; }
-  }
-  if (!$errors && $email !== '') {
-    $existingEmail = $userRepo->findByEmail($email);
-    if ($existingEmail) { $errors[] = 'Email đã được sử dụng. Vui lòng dùng email khác.'; }
-  }
+    
+    // Kiểm tra cơ bản
+    if ($username === '' || $password === '') {
+        $errors[] = 'Cần username và password';
+    }
+    
+    // Kiểm tra trùng username
+    if (!$errors) {
+        $existing = $userRepo->findByUsername($username);
+        if ($existing) {
+            $errors[] = 'Username đã tồn tại.';
+        }
+    }
+    
+    // Kiểm tra trùng email
+    if (!$errors && $email !== '') {
+        $existingEmail = $userRepo->findByEmail($email);
+        if ($existingEmail) {
+            $errors[] = 'Email đã được sử dụng.';
+        }
+    }
+    
+    // Tạo tài khoản
     if (!$errors) {
         $ok = $userRepo->create($username, $password, 'user', $display_name ?: $username, $email ?: null);
-        if ($ok) { $success = true; }
-        else { $errors[] = 'Không thể đăng ký (trùng username/email?).'; }
+        if ($ok) {
+            $success = true;
+        } else {
+            $errors[] = 'Không thể đăng ký.';
+        }
     }
 }
 ?>
@@ -64,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php foreach ($errors as $e): ?><div class="alert"><?php echo htmlspecialchars($e); ?></div><?php endforeach; ?>
     <?php if ($success): ?><div class="success">Đăng ký thành công. Bạn có thể <a href="/webthethao_project/user_login.php">đăng nhập</a>.</div><?php endif; ?>
     <form method="post">
-      <input type="hidden" name="csrf" value="<?php echo Helpers::csrfToken(); ?>" />
       <label>Tên hiển thị</label>
       <input type="text" name="display_name" />
       <label>Username</label>
