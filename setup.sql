@@ -1,5 +1,5 @@
 -- ===================================================================================
--- SCRIPT CÀI ĐẶT DATABASE WEBTHETHAO - PHIÊN BẢN HOÀN CHỈNH VÀ ĐA DẠNG
+-- SCRIPT CÀI ĐẶT DATABASE WEBTHETHAO - PHIÊN BẢN ĐƠN GIẢN
 -- Tự động xóa database cũ nếu tồn tại để tránh xung đột.
 -- ===================================================================================
 
@@ -17,8 +17,7 @@ CREATE TABLE `categories` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `name` varchar(100) NOT NULL,
   `slug` varchar(120) UNIQUE NOT NULL,
-  `parent_id` int(11) DEFAULT NULL,
-  FOREIGN KEY (`parent_id`) REFERENCES `categories` (`category_id`) ON DELETE SET NULL
+  `parent_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `users` (
@@ -46,9 +45,7 @@ CREATE TABLE `articles` (
   `image_url` varchar(255) DEFAULT NULL,
   `author_id` int(11) DEFAULT NULL,
   `is_featured` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`author_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Lượt thích bài viết
@@ -56,9 +53,7 @@ CREATE TABLE `article_likes` (
   `user_id` int(11) NOT NULL,
   `article_id` int(11) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`user_id`, `article_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`article_id`) REFERENCES `articles` (`article_id`) ON DELETE CASCADE
+  PRIMARY KEY (`user_id`, `article_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Lưu bài viết (bookmark)
@@ -66,9 +61,7 @@ CREATE TABLE `article_saves` (
   `user_id` int(11) NOT NULL,
   `article_id` int(11) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`user_id`, `article_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`article_id`) REFERENCES `articles` (`article_id`) ON DELETE CASCADE
+  PRIMARY KEY (`user_id`, `article_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Bài viết đã xem (lưu lần xem cuối)
@@ -76,20 +69,16 @@ CREATE TABLE `article_views` (
   `user_id` int(11) NOT NULL,
   `article_id` int(11) NOT NULL,
   `viewed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`user_id`, `article_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`article_id`) REFERENCES `articles` (`article_id`) ON DELETE CASCADE
+  PRIMARY KEY (`user_id`, `article_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Bình luận bài viết
+-- Comments
 CREATE TABLE `comments` (
   `comment_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `article_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `content` text NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`article_id`) REFERENCES `articles` (`article_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   INDEX (`article_id`),
   INDEX (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
